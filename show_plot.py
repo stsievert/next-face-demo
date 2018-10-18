@@ -1,24 +1,24 @@
-from bokeh.plotting import figure, output_file, show
-import pandas as pd
-from scipy.misc import imresize
-from imageio import imread
-from joblib import Parallel, delayed
-from bokeh.models import Label
-import numpy as np
-from bokeh.client import push_session
-from bokeh.driving import cosine
-from bokeh.plotting import figure, curdoc
-from datetime import datetime
+import os
 import random
 import sys
 import time
-import get_words
-import face_api
-import train
 import traceback
+from datetime import datetime
+
+import numpy as np
+import pandas as pd
+from bokeh.client import push_session
+from bokeh.driving import cosine
+from bokeh.models import Label
+from bokeh.plotting import curdoc, figure, output_file, show
+from imageio import imread
+from joblib import Parallel, delayed
+from scipy.misc import imresize
 from toolz import partial
 
-import os
+import face_api
+import get_words
+import train
 
 
 def read_image(
@@ -107,7 +107,13 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
         loc = e.loc[filename, :]
         img = read_image(filename="faces/" + filename + ".png")
         img = img[::-1, :]  # upside down because jpeg
-        p.image_rgba(image=[img], x=[loc[0]], y=[loc[1]], dw=[0.62 * img_width], dh=[1.2 * img_width])
+        p.image_rgba(
+            image=[img],
+            x=[loc[0]],
+            y=[loc[1]],
+            dw=[0.62 * img_width],
+            dh=[1.2 * img_width],
+        )
 
     return p
 

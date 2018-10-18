@@ -17,11 +17,10 @@ import get_words
 import upload_image
 from show_plot import generate_initial_plot, predict, read_image
 
-FIGURE_DIM  = (1200, 800)
+FIGURE_DIM = (1200, 800)
 
 # create a plot and style its properties
-p = generate_initial_plot(test=True, n_imgs=50, img_width=0.3,
-                          dim=FIGURE_DIM)
+p = generate_initial_plot(test=True, n_imgs=50, img_width=0.3, dim=FIGURE_DIM)
 
 # img = run applescript to take image
 img = read_image("imgs/wanted.png")
@@ -185,7 +184,9 @@ def demo_callback(*args, **kwargs):
     * Click on red button and select "source: iPhone"
 
     """
-    os.system("""osascript -e 'tell application "Keyboard Maestro Engine" to do script "3CF8CFB6-5A27-47FF-8DFF-F6CBA7FCE841"'""")
+    os.system(
+        """osascript -e 'tell application "Keyboard Maestro Engine" to do script "3CF8CFB6-5A27-47FF-8DFF-F6CBA7FCE841"'"""
+    )
     print("\n" + "picture taken" + "\n")
     with open("webcam.png", "rb") as f:
         callback(f)

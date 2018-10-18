@@ -1,19 +1,24 @@
-import requests
-import pandas as pd
-import numpy as np
 import asyncio
-import upload_image
-from scipy.spatial import distance
+import os
 import traceback
 from pprint import pprint
-import os
+
+import numpy as np
+import pandas as pd
+import requests
+from scipy.spatial import distance
+
+import upload_image
 
 KEY = os.environ.get("FACEPP_KEY", None)
 SECRET = os.environ.get("FACEPP_SECRET", None)
 if KEY is None or SECRET is None:
-    raise ValueError("Face++ secret and key are missing. Generate one at"
-                     "https://www.faceplusplus.com/ and export as FACEPP_KEY"
-                     "and FACEPP_SECRET")
+    raise ValueError(
+        "Face++ secret and key are missing. Generate one at"
+        "https://www.faceplusplus.com/ and export as FACEPP_KEY"
+        "and FACEPP_SECRET"
+    )
+
 
 def face_api_response(image_url, n_features=25, repeat=2):
     if repeat < 0:
@@ -24,10 +29,7 @@ def face_api_response(image_url, n_features=25, repeat=2):
         r1 = requests.post(
             "https://faceplusplus-faceplusplus.p.mashape.com/detection/detect",
             data=args,
-            headers={
-                "X-Mashape-Key": KEY,
-                "Accept": "application/json",
-            },
+            headers={"X-Mashape-Key": KEY, "Accept": "application/json"},
         )
         print("   end POST to find faces img URL")
 
@@ -119,10 +121,7 @@ def normalize(face_, feature_names):
 
 
 def facepp_response(url):
-    creds = {
-        "key": KEY,
-        "secret": SECRET
-    }
+    creds = {"key": KEY, "secret": SECRET}
     r = requests.post(
         "https://api-us.faceplusplus.com/facepp/v3/detect",
         params={
@@ -133,7 +132,7 @@ def facepp_response(url):
         },
     )
     assert r.status_code == 200, "Request failed"
-    faces = r.json()['faces']
+    faces = r.json()["faces"]
     if len(faces) == 0:
         print("Response:\n")
         pprint(r.json())

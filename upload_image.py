@@ -1,15 +1,18 @@
 
-import sys
-import dropbox
-from dropbox.files import WriteMode
-from dropbox.exceptions import ApiError, AuthError
 import os
+import sys
+
+import dropbox
+from dropbox.exceptions import ApiError, AuthError
+from dropbox.files import WriteMode
 
 TOKEN = os.environ.get("DRPBX_TOKEN", None)
 if TOKEN is None:
     url = "https://blogs.dropbox.com/developers/2014/05/generate-an-access-token-for-your-own-account/"
-    raise ValueError("DRPBX_TOKEN needs to be set to be one of Dropbox's"
-                     "OAuth2 access tokens. For details, see " + url)
+    raise ValueError(
+        "DRPBX_TOKEN needs to be set to be one of Dropbox's"
+        "OAuth2 access tokens. For details, see " + url
+    )
 
 # make an instance of a Dropbox class which can make requests to the API.
 dbx = dropbox.Dropbox(TOKEN)

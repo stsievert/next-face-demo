@@ -1,13 +1,13 @@
+import json
+import pickle
+
 import numpy as np
+import pandas as pd
+from joblib import Parallel, delayed
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import train_test_split
-import pickle
-import pandas as pd
+
 import face_api
-import json
-
-from joblib import Parallel, delayed
-
 
 DIR = "./train-files/"
 y = pd.read_csv(DIR + "embedding.csv", index_col="Item")
@@ -32,7 +32,7 @@ else:
     len_before = len(D)
     cols = D.columns
     df = pd.merge(y, D, left_index=True, right_index=True)
-    y = df[['x', 'y']]
+    y = df[["x", "y"]]
     D = df[cols]
     assert len(D) == len_before
 
@@ -55,6 +55,7 @@ if __name__ == "__main__":
     print("median distance", np.median(distance))
 
     import matplotlib.pyplot as plt
+
     plt.figure()
     for y_h, yi in zip(y_hat, y):
         plt.plot(*y_h, "ro")
