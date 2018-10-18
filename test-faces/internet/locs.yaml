@@ -1,0 +1,36 @@
+- face:
+  filename: 1.jpg
+  location: [-0.5, 0.5]
+- face:
+  filename: 2.jpg
+  location: [-0.5, 0.6]
+- face:
+  filename: 3.png
+  location: [-0.5, -0.5]
+- face:
+  filename: 4.jpg
+  location: [-0.5, 0.5]
+- face:
+  filename: 5.png
+  location: [0, -0.9]
+- face:
+  filename: 6.jpeg
+  location: [-0.5, 0]
+- face:
+  filename: 7.jpg
+  location: [0, -1]
+- face:
+  filename: 8.png
+  location: [0.5, -1]
+- face:
+  filename: 9.jpeg
+  location: [-0.5, 0.5]
+- face:
+  filename: 10.jpeg
+  location: [-0.3, -0.6]
+- face:
+  filename: 11.jpeg
+  location: [0.1, 0.7]
+- face:
+  filename: 12.jpeg
+  location: [-0.5, 0.5]
