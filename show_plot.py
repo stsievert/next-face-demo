@@ -16,7 +16,7 @@ from joblib import Parallel, delayed
 from scipy.misc import imresize
 from toolz import partial
 
-import face_api
+import face_api_local as face_api
 import get_words
 import train
 

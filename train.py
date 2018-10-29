@@ -7,7 +7,7 @@ from joblib import Parallel, delayed
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import train_test_split
 
-import face_api
+import face_api_local as face_api
 
 DIR = "./train-files/"
 y = pd.read_csv(DIR + "embedding.csv", index_col="Item")
