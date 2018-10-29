@@ -1,7 +1,7 @@
 
 ## NEXT face embedding demo
 
-Start the demo with `bokeh serve myapp`.
+Start the demo with `bokeh serve myapp.py`.
 
 ### TODOs
 1. make the feature finding of the face local (see https://github.com/stsievert/next-face-demo/issues/1)

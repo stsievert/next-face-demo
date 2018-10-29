@@ -8,7 +8,7 @@ from scipy.spatial import distance
 
 def get_facial_landmarks(url):
     ''' gets facial landmarks for an image at the given url '''
-    image = face_recognition.load_image_file("./faces/" + url)
+    image = face_recognition.load_image_file(url)
     return face_recognition.face_landmarks(image)[0]
 
 def sort_api_data(x):
