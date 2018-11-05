@@ -67,11 +67,6 @@ r = p.text(
 def callback(f):
     ''' Takes in an image file and then process it to be placed onto the map '''
 
-    #  img_name = "webcam.png"
-    #  crop_image = True
-    #  img = read_image(img_name)
-    img = imageio.imread("imgs/calvin.png")[::-1, :]
-    e.data_source.data.update(image=[img], dh=[WIDTH])
     w.text = "Thinking..."
     with f:
         img = imageio.imread(f.read())
@@ -117,26 +112,26 @@ def callback(f):
     w.text = ", ".join(emotions)
 
 def webcam_callback():
+    ''' grabs and modifys and image from the webcame to be used by the call back function '''
+    ''' potential for furthur speed increase if we can keep image in memory the entire time rather than reading it from a file '''
     print("Capturing image via webcam...")
     camera = cv2.VideoCapture(0)
     return_value, image = camera.read()
-    cv2.imwrite('webcam.png', image)
-    optimize_image('webcam.png')
     del(camera)
+
+    print("Optimizing webcame image...")
+    r = maxWebcamHeight / image.shape[1] # ratio of image
+    dim = (maxWebcamHeight, int(image.shape[0] * r)) # new dimension
+    imgSmall = cv2.resize(image, dim, interpolation = cv2.INTER_AREA) # resize
+    cv2.imwrite('webcam.png', imgSmall)
+
+    print("Processing image...")
     with open("webcam.png", "rb") as f:
         print("Processing image....")
         callback(f)
 
-def optimize_image(url):
-    ''' takes the image and resizes it to be more efficent '''
-    img = cv2.imread(url)
-    r = maxWebcamHeight / img.shape[1] # ratio of image
-    dim = (maxWebcamHeight, int(img.shape[0] * r)) # new dimension
-    imgSmall = cv2.resize(img, dim, interpolation = cv2.INTER_AREA) # resize
-    cv2.imwrite('webcam.png', imgSmall)
-    print("Reduced size of webcame image...")
-
 def test_callback():
+    ''' call back method used purely for testing purposes so we can test without having to lucnh the entire application'''
     with open("webcam.png", "rb") as f:
         print("Processing image....")
         callback(f)
