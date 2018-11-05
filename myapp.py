@@ -17,6 +17,9 @@ from show_plot import generate_initial_plot, predict, read_image
 
 # Interface setup ==============================================================
 
+# make webcam image WIDTH
+maxWebcamHeight = 120
+
 # Set up size of figure
 FIGURE_DIM = (1200, 800)
 
@@ -91,9 +94,6 @@ def callback(f):
     with io.BytesIO() as f:
         imageio.imwrite(f, img, format="png")
         f.seek(0)
-        print("Uploading image...", end=" ")
-        #url = upload_image.upload(f, "webcam.png")
-        print("done")
     try:
         y = predict('./webcam.png', verbose=True)
     except:
@@ -117,11 +117,28 @@ def callback(f):
     w.text = ", ".join(emotions)
 
 def webcam_callback():
+    print("Capturing image via webcam...")
     camera = cv2.VideoCapture(0)
     return_value, image = camera.read()
     cv2.imwrite('webcam.png', image)
+    optimize_image('webcam.png')
     del(camera)
     with open("webcam.png", "rb") as f:
+        print("Processing image....")
+        callback(f)
+
+def optimize_image(url):
+    ''' takes the image and resizes it to be more efficent '''
+    img = cv2.imread(url)
+    r = maxWebcamHeight / img.shape[1] # ratio of image
+    dim = (maxWebcamHeight, int(img.shape[0] * r)) # new dimension
+    imgSmall = cv2.resize(img, dim, interpolation = cv2.INTER_AREA) # resize
+    cv2.imwrite('webcam.png', imgSmall)
+    print("Reduced size of webcame image...")
+
+def test_callback():
+    with open("webcam.png", "rb") as f:
+        print("Processing image....")
         callback(f)
 
 # Trigger button ===============================================================
