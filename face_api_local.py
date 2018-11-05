@@ -9,6 +9,9 @@ from scipy.spatial import distance
 def get_facial_landmarks(url):
     ''' gets facial landmarks for an image at the given url '''
     image = face_recognition.load_image_file(url)
+    landmarks = face_recognition.face_landmarks(image)
+    if len(landmarks) == 0:
+        print("WARNING: No face found")
     return face_recognition.face_landmarks(image)[0]
 
 def sort_api_data(x):
