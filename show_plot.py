@@ -39,10 +39,10 @@ def read_image(
         horiz = np.clip(horiz, 0, rgba.shape[0])
         vert = np.clip(vert, 0, rgba.shape[1])
 
-        print("--------------")
-        print(rgba.shape)
+        print("[PLOT] --------------")
+        print("[PLOT] " + rgba.shape)
         # rgba = rgba[horiz[0]:horiz[1], vert[0]:vert[1]]
-        print(rgba.shape)
+        print("[PLOT] " + rgba.shape)
     else:
         rgba = imresize(rgba, percent_scale)
 
@@ -120,22 +120,22 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
 
 def predict(url, verbose=False):
     if verbose:
-        print("Entering show_plot.predict")
-        print("Finding face feature vectors...")
+        print("[PLOT] Entering show_plot.predict")
+        print("[PLOT] Finding face feature vectors...")
     x = face_api.distances(url)
     if verbose:
-        print("Model predicting...")
+        print("[PLOT] Model predicting...")
     y = train.model.predict(x.reshape(1, -1))
     if np.linalg.norm(y) > 1:
         y /= np.linalg.norm(y)
     # y = np.clip(y, -1, 1)
     if verbose:
-        print("Exiting show_plot.predict")
+        print("[PLOT] Exiting show_plot.predict")
     return y.flat[:]
 
 
 def update_plot(img_name="webcam.png"):
-    print("Press {enter, space} to read webcam.png")
+    print("[PLOT] Press {enter, space} to read webcam.png")
     #  getch = Getch()
     #  key = ord(getch())  # input()
     if key in {13, 32}:
@@ -150,26 +150,26 @@ def _update_plot():
     crop_image = True
     img = read_image(img_name)
     img = img[::-1, :]
-    print("Uploading image...")
+    print("[PLOT] Uploading image...")
     try:
         y = predict(img_name, verbose=True)
     except:
         err = sys.exc_info()[0]
-        print("Error embedding face")
-        print("**** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
-        print(traceback.format_exc())
+        print("[PLOT] Error embedding face")
+        print("[PLOT] **** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
+        print("[PLOT] " + traceback.format_exc())
         crop_image = False
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2
-    print("Finding the words...")
+    print("[PLOT] Finding the words...")
     words = get_words.find_words(y)
-    print(words)
+    print("[PLOT] " + words)
     # ds_words.data.update(x=y[0], y=y[1], text=", ".join(words))
     w.x = y[0]
     w.y = y[1]
     w.text = ", ".join(words)
     ds.data.update(x=[y[0]], y=[y[1]], image=[img])
-    print(y, w)
+    print("[PLOT] " + y, w)
 
 
 if __name__ == "__main__":
