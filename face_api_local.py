@@ -32,8 +32,6 @@ def sort_api_data(x):
 
 def normalize(face_, feature_names):
     ''' normalizes all points on the face to be based around the nose '''
-
-    print("[FACEAPI] Normalizing data...")
     face = face_
 
     # find the middle point of the nose and use it for the normal point
@@ -93,12 +91,9 @@ def normalize(face_, feature_names):
 def reduce_data(face):
     ''' we have around 60 points but we only want 17 so this function reduces it '''
     # take one face, return the normalized data rather than directly modifying a dataframe
-    # X = [Dm(img) for img in imgs] Dm returns a dictionary of the distanses with various distnases
-    # y = [f(c) for x in X] where y = predict
     # we have 60 data points but we only want 17 so take about 1/3 of the points
     range = 0.25
     while get_number_points_face(face) > 17:
-        print(type(face))
         for x in face:
             if get_number_points_face(face) <= 17:
                 break;
@@ -118,22 +113,23 @@ def get_number_points_face(face):
             i += 1
     return i
 
+def convert_double_array_to_single(double):
+    ''' Converts a two dimensional array to a one dimensional array '''
+    single = []
+    for x in double:
+        for y in x:
+            single.append(y)
+    return single;
+
+
 # run all faces through this and get that data
 # use that to predict enveddubg cordinates
 def distances(url):
-    ''' gets distances of all faces from a given url '''
-    face = get_facial_landmarks(url)
-    face, names = sort_api_data(face)
-    face = normalize(face, names)  # see above for my confusion on this
-    face = reduce_data(face)
-
-    # wants a m by n array where n is two values (x,y) and m is number of points
-    # the array i got above, however, isnt even close to that, its 9 by N where
-    # n is the number of points under that specific point of the face
-    # bellow I will convert them into a Mx2 array and see if that workds
-    newFace = []
-    for x in face:
-        for y in x:
-            newFace.append(y) # make sure nx2
-    face_dist = distance.pdist(newFace)    # find distances
-    return face_dist
+    ''' gets distances of a face from a given url '''
+    face = get_facial_landmarks(url)    # get landmarks
+    face, names = sort_api_data(face)   # sort given deata
+    face = normalize(face, names)       # normalize all facial data
+    face = reduce_data(face)            # reduce from 60 points to 17
+    face = convert_double_array_to_single(face) # transforms our array of arrays into a singular array of points
+    distances = distance.pdist(face)    # distances between each point
+    return distances
