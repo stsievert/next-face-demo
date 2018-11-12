@@ -1,19 +1,19 @@
 
-## NEXT face embedding demo
+# NEXT Face Embedding Demo
+
+This is a demo guesses the facial emotion of the user and maps it against a facial emotion map generate using NEXT.
 
 Start the demo with `bokeh serve myapp.py`.
 
-### TODOs
-1. make the feature finding of the face local (see https://github.com/stsievert/next-face-demo/issues/1)
-2. use webcam instead of file upload (see https://github.com/stsievert/next-face-demo/issues/2)
+Note the on macOS, only the default Terminal client has access to the webcam, other clients such as iTerm2 will not work at this time.
 
-This will mean that
+## Completed
+1. Finding of facial features is now local
+2. Using webcam rather than dropbox file upload
+3. Retrain model to match changes above
+4. Massive speed increases
 
-1. make the feature finding of the face local
-    * Images will not have to uploaded to dropbox
-    * Face++ API will not be used
-    * embedding new images will be much quicker (no upload)
-
-2. [ ] use webcam instead of file upload
-    * can have live updates, not discrete updates
-    * might change threat model?
+## TODOs
+1. Further increase speed by never writing image to disk
+2. Continuous image capture and plot updates via webcam
+3. Plot predicted values versus actual values to get an idea of the cost
