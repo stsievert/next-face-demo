@@ -1,3 +1,32 @@
+# todo:     normalize around the nose, size of head is 1.0 by 1.0
+# completed
+#
+# todo:     train model, use model.train see image of whiteboard on phone
+# steps:    get the x and y from the csv file nx2
+#           get distances from that
+#           train model based off of those distances
+#           check how good: create a plot basing either distance between points or angle between them (real vs expected), make a histogram
+# issues:   understanding previous training code
+#
+#
+# todo:     get accurracy way, plot distance between prediction via a plot of the guess vs actually answer
+# issues:   waiting for other steps
+#
+# todo:     continually take pictures with a timer continually showing how long until the next pucture is taken
+#           do later
+#
+# todo:     line_profiler
+# findings: We can likely get a 200% speed increase
+#           majority of time is spent on the following functions
+#           img = imageio.imread(f.read())
+#           img = imresize(img, out_shape, preserve_range=True).astype("uint8")
+#           imageio.imwrite(f, img, format="png")
+#           y = predict('./webcam.png', verbose=True)
+# results:  noting that most issues stemmed from drawing/maniupulating images, I reduced the size of the image and found
+#           around a 10-15x speed increase. This was so much faster that loading the calvin image actually had a slight hit to the speed
+#           so I removed that and now it is at a good speed but it could be further improved
+
+
 # Imports ======================================================================
 import base64
 import io
@@ -78,14 +107,13 @@ def callback(f):
             rgba[..., 3] = 255
             img = rgba
     img = img[::-1, :]
-    print("IMG.SHAPE =", img.shape)
-    #  imresize(img, out_shape, preserve_range=True)
+    print("[MYAPP][CALLBACK] IMG.SHAPE =", img.shape)
     if min(img.shape[:2]) > 512:
         scale = 512 / min(img.shape[:2])
         _w, _h, _c = img.shape
         out_shape = (int(_w * scale), int(_h * scale), _c)
         img = imresize(img, out_shape, preserve_range=True).astype("uint8")
-    print("IMG.SHAPE =", img.shape)
+    print("[MYAPP][CALLBACK] IMG.SHAPE =", img.shape)
     with io.BytesIO() as f:
         imageio.imwrite(f, img, format="png")
         f.seek(0)
@@ -93,47 +121,51 @@ def callback(f):
         y = predict('./webcam.png', verbose=True)
     except:
         err = sys.exc_info()[0]
-        print("Error embedding face")
-        print("**** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
-        print(traceback.format_exc())
+        print("[MYAPP][CALLBACK] Error embedding face")
+        print("[MYAPP][CALLBACK] **** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
+        print("[MYAPP][CALLBACK] " + traceback.format_exc())
         crop_image = False
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2
 
     aspect_ratio = img.shape[0] / img.shape[1]
     e.data_source.data.update(
-        x=[y[0]], y=[y[1]], image=[img]  # , dw=[WIDTH], dh=[WIDTH * aspect_ratio]
+        x=[y[0]], y=[y[1]], image=[img]
     )
     emotions = get_words.find_words(y)
-    print("Predicted emotions:", emotions)
+    print("[MYAPP][CALLBACK] Predicted emotions:", emotions)
     # ds_words.data.update(x=y[0], y=y[1], text=", ".join(words))
     w.x = y[0]
     w.y = y[1]
     w.text = ", ".join(emotions)
 
 def webcam_callback():
-    ''' grabs and modifys and image from the webcame to be used by the call back function '''
-    ''' potential for furthur speed increase if we can keep image in memory the entire time rather than reading it from a file '''
-    print("Capturing image via webcam...")
+    ''' grabs and modifys and image from the webcame to be used by the call back
+    function. Potential for furthur speed increase if we can keep image in
+    memory the entire time rather than reading it from a file '''
+
+    print("[MYAPP][WEBCAM] Capturing image via webcam...")
     camera = cv2.VideoCapture(0)
     return_value, image = camera.read()
     del(camera)
 
-    print("Optimizing webcame image...")
+    print("[MYAPP][WEBCAM] Optimizing webcame image...")
     r = maxWebcamHeight / image.shape[1] # ratio of image
     dim = (maxWebcamHeight, int(image.shape[0] * r)) # new dimension
     imgSmall = cv2.resize(image, dim, interpolation = cv2.INTER_AREA) # resize
     cv2.imwrite('webcam.png', imgSmall)
 
-    print("Processing image...")
+    print("[MYAPP][WEBCAM] Processing image...")
     with open("webcam.png", "rb") as f:
         print("Processing image....")
         callback(f)
 
 def test_callback():
-    ''' call back method used purely for testing purposes so we can test without having to lucnh the entire application'''
+    ''' call back method used purely for testing purposes so we can test without
+     having to lucnh the entire application'''
+
     with open("webcam.png", "rb") as f:
-        print("Processing image....")
+        print("[MYAPP][TEST] Processing image....")
         callback(f)
 
 # Trigger button ===============================================================
@@ -143,3 +175,6 @@ demo = Button(label="Take Picture via Webcam", button_type="success")
 demo.on_click(webcam_callback)
 button = demo
 curdoc().add_root(column(button, p))
+
+#testing
+test_callback()
