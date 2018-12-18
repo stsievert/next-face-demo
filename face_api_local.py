@@ -70,22 +70,6 @@ def normalize(face_, feature_names):
             face[fetIndex][i] = (newX, newY)
             i += 1
 
-    # origional code ===========================================================
-    # i need help making my code above more compact like this
-    # # make the nose (0, 0)
-    # face["x"] -= face.T["nose_tip"]["x"]
-    # face["y"] -= face.T["nose_tip"]["y"]
-    # # divide horizontally by distance of eyes
-    # norm = np.linalg.norm
-    # face["x"] /= norm(face.T["right_eye_center"] - face.T["left_eye_center"])
-    #
-    # # divide vertically by distance from eyes to nose
-    # # works because the nose is at 0
-    # vert_dist = np.mean(
-    #     [norm(face.T["right_eye_center"]), norm(face.T["left_eye_center"])]
-    # )
-    # face["y"] /= vert_dist
-
     return face
 
 def reduce_data(face):
@@ -102,7 +86,7 @@ def reduce_data(face):
                 if rand < range:
                     x.remove(y)
                     break
-    assert get_number_points_face(face) == 17   # we should have 17 points after this
+    assert get_number_points_face(face) == 17
     return face
 
 def get_number_points_face(face):

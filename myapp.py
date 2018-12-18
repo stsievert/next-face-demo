@@ -1,4 +1,4 @@
-# todo:     normalize around the nose, size of head is 1.0 by 1.0
+dont # todo:     normalize around the nose, size of head is 1.0 by 1.0
 # completed
 #
 # todo:     train model, use model.train see image of whiteboard on phone
