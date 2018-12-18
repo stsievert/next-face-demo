@@ -5,6 +5,7 @@ import numpy as np
 from joblib import Parallel, delayed
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import LeaveOneOut
+from sklearn.linear_model import Lasso
 import show_plot as sp
 
 # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
@@ -17,7 +18,7 @@ y = loader.results
 D = loader.data
 
 n = len(y)
-model = KernelRidge(alpha=1 / n)
+model = Lasso(alpha=1 / n)
 
 def trainModelForTrainTestSplit(train, test):
     trainData = []
