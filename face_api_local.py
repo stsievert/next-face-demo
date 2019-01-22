@@ -30,6 +30,8 @@ def sort_api_data(x):
     y = [x[k] for k in keys]
     return y, keys
 
+# test this by ploting all the points from one face
+# then normalize it, and plot it again, it should be about the same then
 def normalize(face_, feature_names):
     ''' normalizes all points on the face to be based around the nose '''
     face = face_

@@ -6,8 +6,6 @@ from sklearn.model_selection import LeaveOneOut
 plt.rcParams['figure.figsize'] = [10, 10]
 
 # tests the model we generate
-data = train.testData
-results = train.testDataResults
 distances = train.distances
 angles = train.angles
 changes = train.changes
