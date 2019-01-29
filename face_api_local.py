@@ -5,6 +5,7 @@ import face_recognition
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance
+import numpy.linalg as LA
 
 def get_facial_landmarks(url):
     ''' gets facial landmarks for an image at the given url '''
@@ -14,8 +15,9 @@ def get_facial_landmarks(url):
         print("[FACEAPI] WARNING: No face found")
     return face_recognition.face_landmarks(image)[0]
 
-def sort_api_data(x):
+def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
     ''' sorts API data according to the provided keys '''
+    import ipdb; ipdb.set_trace()
     keys = [
         "chin",
         "left_eyebrow",
@@ -32,47 +34,27 @@ def sort_api_data(x):
 
 # test this by ploting all the points from one face
 # then normalize it, and plot it again, it should be about the same then
-def normalize(face_, feature_names):
-    ''' normalizes all points on the face to be based around the nose '''
+def normalize(face_: list[list[tuple]], feature_names: list[str]) -> list[tuple]:
+    """ normalizes all points on the face to be based around the nose """
     face = face_
 
-    # find the middle point of the nose and use it for the normal point
-    noseIndex = feature_names.index('nose_tip')
-    normalPoints = face[noseIndex]
-    normal = normalPoints[int(len(face[noseIndex])/2)] # main normal point
+    nose_points = face[feature_names.index("nose_tip")]
+    nose = nose_points[len(nose_points) // 2]  # randomly choose a point as the origin
 
-    # loop over each point in the face and then subtract the normal from it
-    for fetIndex in [feature_names.index(f) for f in feature_names]:
-        i = 0
-        for pt in face[fetIndex]:
-            newX = pt[0] - normal[0]
-            newY = pt[1] - normal[1]
-            face[fetIndex][i] = (newX, newY)
-            i += 1
-    # get the normalization values
-    rightEyeCenterIndex = feature_names.index('right_eye')
-    leftEyeCenterIndex = feature_names.index('left_eye')
-    rightEye = face[rightEyeCenterIndex]
-    leftEye = face[leftEyeCenterIndex]
-    # subtract right from left eye
-    netEye = np.subtract(rightEye, leftEye)
-    # get the value of the normal
-    norm = np.linalg.norm
-    xNorm = norm(netEye)
-    # y norm is average of normal of left and right eye
-    rightNorm = norm(np.subtract(face[rightEyeCenterIndex], (0, 0)))
-    leftNorm = norm(np.subtract(face[leftEyeCenterIndex], (0, 0)))
-    yNorm = (rightNorm + leftNorm) / 2.0
-    # apply the normalization to the x of the face values
-    for fetIndex in [feature_names.index(f) for f in feature_names]:
-        i = 0
-        for pt in face[fetIndex]:
-            newX = pt[0] / xNorm
-            newY = pt[1] / yNorm
-            face[fetIndex][i] = (newX, newY)
-            i += 1
+    # setting the nose to be the origin
+    face_points = [(p[0] - nose[0], p[1] - nose[1]) for group in face for p in group]
 
-    return face
+    right_eye = face[feature_names.index('right_eye')]
+    left_eye = face[feature_names.index('left_eye')]
+
+    one_unit = LA.norm(np.array(right_eye) - np.array(left_eye))
+
+    # account for distance from camera because human faces are pretty similar
+    # mostly, distance between eyes has a good relation the other facial distances
+    # so, squish/expand points by the distance between the eyes
+    face_points = [(p[0] / one_unit, p[1] / one_unit) for p in face_points]
+
+    return face_points
 
 def reduce_data(face):
     ''' we have around 60 points but we only want 17 so this function reduces it '''
