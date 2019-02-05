@@ -6,7 +6,6 @@ from joblib import Parallel, delayed
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import LeaveOneOut
 from sklearn.linear_model import Lasso
-import show_plot as sp
 
 # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
 def angle_between(p1, p2):
@@ -14,20 +13,14 @@ def angle_between(p1, p2):
     ang2 = np.arctan2(*p2[::-1])
     return np.rad2deg((ang1 - ang2) % (2 * np.pi))
 
-y = loader.results
-D = loader.data
-
-n = len(y)
-model = Lasso(alpha=1 / n)
-
-def trainModelForTrainTestSplit(train, test):
+def _trainModelForTrainTestSplit(train, test, data, results, model):
     trainData = []
     trainDataResults  = []
     testData = []
     testDataResults = []
 
     i = 0
-    for value in D:
+    for value in data:
         if i in train:
             trainData.append(value)
         else:
@@ -35,7 +28,7 @@ def trainModelForTrainTestSplit(train, test):
         i += 1
     # get train Y data
     i = 0
-    for x in y:
+    for x in results:
         if i in train:
             trainDataResults.append(x)
         else:
@@ -45,22 +38,28 @@ def trainModelForTrainTestSplit(train, test):
     model.fit(trainData, trainDataResults)
     return testData, testDataResults
 
-loo = LeaveOneOut()
-loo.get_n_splits(D)
-distances = []
-angles = []
-changes = []
+def trainModel(results, data, model):
+    y = results
+    D = data
+    model = model
+    loo = LeaveOneOut()
+    loo.get_n_splits(D)
+    distances = []
+    angles = []
+    changes = []
 
-for train_index, test_index in loo.split(D):
-    # train model after each change
-    testData, testDataResults = trainModelForTrainTestSplit(train_index, test_index)
-    # get variance for one test item
-    d = testData[0]
-    y1 = model.predict(d.reshape(1, -1))
-    if np.linalg.norm(y1) > 1:
-        y1 /= np.linalg.norm(y1)
-    # save findings
-    res = testDataResults[0]
-    changes.append([testDataResults[0], y1[0]])
-    distances.append(np.linalg.norm(y1[0] - res))
-    angles.append(min(angle_between(y1[0], res), angle_between(res, y1[0])))
+    for train_index, test_index in loo.split(D):
+        # train model after each change
+        testData, testDataResults = _trainModelForTrainTestSplit(train_index, test_index, D, y, model)
+        # get variance for one test item
+        d = testData[0]
+        y1 = model.predict(d.reshape(1, -1))
+        if np.linalg.norm(y1) > 1:
+            y1 /= np.linalg.norm(y1)
+        # save findings
+        res = testDataResults[0]
+        changes.append([testDataResults[0], y1[0]])
+        distances.append(np.linalg.norm(y1[0] - res))
+        angles.append(min(angle_between(y1[0], res), angle_between(res, y1[0])))
+
+trainModel(loader.results, loader.data, Lasso(alpha=0.006))
