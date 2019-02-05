@@ -24,8 +24,13 @@ def graphMetrics(distances, angles, changes):
     plt.title('expected vs actual face location')
     max_lines = 20
     for pair in changes:
+        # first value in changes = expected, 2nd = prediction
         if max_lines > 0:
-            plt.plot(pair[0], pair[1], 'ro-')
+            x_vals = [pair[0][0],pair[1][0]]
+            y_vals = [pair[0][1],pair[1][1]]
+            plt.plot(x_vals, y_vals, 'ro-')
+            plt.plot(pair[0][0], pair[0][1], 'og') # expected location = green
+            plt.plot(pair[1][0], pair[1][1], 'ob') # predicted location = blue
         max_lines -= 1
 
     # set up second plot, angle histogram
