@@ -118,22 +118,6 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
     return p
 
 
-def predict(url, verbose=False):
-    if verbose:
-        print("[PLOT] Entering show_plot.predict")
-        print("[PLOT] Finding face feature vectors...")
-    x = face_api.distances(url)
-    if verbose:
-        print("[PLOT] Model predicting...")
-    y = train.model.predict(x.reshape(1, -1))
-    if np.linalg.norm(y) > 1:
-        y /= np.linalg.norm(y)
-    # y = np.clip(y, -1, 1)
-    if verbose:
-        print("[PLOT] Exiting show_plot.predict")
-    return y.flat[:]
-
-
 def update_plot(img_name="webcam.png"):
     print("[PLOT] Press {enter, space} to read webcam.png")
     #  getch = Getch()

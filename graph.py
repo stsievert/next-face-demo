@@ -1,10 +1,14 @@
 import numpy as np
-import train
 import matplotlib.pyplot as plt
 from sklearn.model_selection import LeaveOneOut
 
-
 def graphMetrics(distances, angles, changes):
+    """
+    given an array of points for distances, an array of points for angles and
+    and array of tuples for changes, this functions plots each of the given
+    metrics
+    """
+
     plt.rcParams['figure.figsize'] = [10, 10]
 
     # Set up the first plot (location changes)
@@ -37,4 +41,11 @@ def graphMetrics(distances, angles, changes):
     plt.xlabel('Distance Real vs Actual')
     plt.title('distance between results/expected')
     plt.hist(distances, bins=10)
+    plt.show()
+
+def plot_points(points):
+    """ given an arary of tuples of points, plots them all  """
+    x_vals = [x[0] for x in points]
+    y_vals = [x[1] for x in points]
+    plt.plot(x_vals, y_vals, 'or')
     plt.show()

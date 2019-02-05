@@ -62,4 +62,10 @@ def trainModel(results, data, model):
         distances.append(np.linalg.norm(y1[0] - res))
         angles.append(min(angle_between(y1[0], res), angle_between(res, y1[0])))
 
-trainModel(loader.results, loader.data, Lasso(alpha=0.006))
+    return distances, angles, changes
+
+def default():
+    data, results = loader.load_face_data()
+    distances, angles, changes = trainModel(results, data, Lasso(alpha=0.006))
+
+default()

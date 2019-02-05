@@ -14,6 +14,7 @@ def get_facial_landmarks(url):
     landmarks = face_recognition.face_landmarks(image)
     if len(landmarks) == 0:
         print("[FACEAPI] WARNING: No face found")
+    #import ipdb; ipdb.set_trace()
     return face_recognition.face_landmarks(image)[0]
 
 def sort_api_data(x):
@@ -55,15 +56,8 @@ def normalize(face_, feature_names):
     # mostly, distance between eyes has a good relation the other facial distances
     # so, squish/expand points by the distance between the eyes
     face_points = [(p[0] / one_unit, p[1] / one_unit) for p in face_points]
-    
-    return face_points
 
-def plot_points(points):
-    """ given an arary of tuples of points, plots them all  """
-    x_vals = [x[0] for x in points]
-    y_vals = [x[1] for x in points]
-    plt.plot(x_vals, y_vals, 'or')
-    plt.show()
+    return face_points
 
 # run all faces through this and get that data
 # use that to predict enveddubg cordinates

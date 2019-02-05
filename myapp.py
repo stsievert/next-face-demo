@@ -1,32 +1,3 @@
-# todo:     normalize around the nose, size of head is 1.0 by 1.0
-# completed
-#
-# todo:     train model, use model.train see image of whiteboard on phone
-# steps:    get the x and y from the csv file nx2
-#           get distances from that
-#           train model based off of those distances
-#           check how good: create a plot basing either distance between points or angle between them (real vs expected), make a histogram
-# issues:   understanding previous training code
-#
-#
-# todo:     get accurracy way, plot distance between prediction via a plot of the guess vs actually answer
-# issues:   waiting for other steps
-#
-# todo:     continually take pictures with a timer continually showing how long until the next pucture is taken
-#           do later
-#
-# todo:     line_profiler
-# findings: We can likely get a 200% speed increase
-#           majority of time is spent on the following functions
-#           img = imageio.imread(f.read())
-#           img = imresize(img, out_shape, preserve_range=True).astype("uint8")
-#           imageio.imwrite(f, img, format="png")
-#           y = predict('./webcam.png', verbose=True)
-# results:  noting that most issues stemmed from drawing/maniupulating images, I reduced the size of the image and found
-#           around a 10-15x speed increase. This was so much faster that loading the calvin image actually had a slight hit to the speed
-#           so I removed that and now it is at a good speed but it could be further improved
-
-
 # Imports ======================================================================
 import base64
 import io
@@ -42,7 +13,8 @@ from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from skimage.transform import resize as imresize
-from show_plot import generate_initial_plot, predict, read_image
+from show_plot import generate_initial_plot, read_image
+from predict import predict
 
 # Interface setup ==============================================================
 
