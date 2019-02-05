@@ -5,6 +5,7 @@ import face_recognition
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance
+import matplotlib.pyplot as plt
 import numpy.linalg as LA
 
 def get_facial_landmarks(url):
@@ -15,9 +16,9 @@ def get_facial_landmarks(url):
         print("[FACEAPI] WARNING: No face found")
     return face_recognition.face_landmarks(image)[0]
 
-def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
+def sort_api_data(x):
+    #def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
     ''' sorts API data according to the provided keys '''
-    import ipdb; ipdb.set_trace()
     keys = [
         "chin",
         "left_eyebrow",
@@ -34,7 +35,8 @@ def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
 
 # test this by ploting all the points from one face
 # then normalize it, and plot it again, it should be about the same then
-def normalize(face_: list[list[tuple]], feature_names: list[str]) -> list[tuple]:
+def normalize(face_, feature_names):
+    # def normalize(face_: list[list[tuple]], feature_names: list[str]) -> list[tuple]:
     """ normalizes all points on the face to be based around the nose """
     face = face_
 
@@ -53,42 +55,15 @@ def normalize(face_: list[list[tuple]], feature_names: list[str]) -> list[tuple]
     # mostly, distance between eyes has a good relation the other facial distances
     # so, squish/expand points by the distance between the eyes
     face_points = [(p[0] / one_unit, p[1] / one_unit) for p in face_points]
-
+    
     return face_points
 
-def reduce_data(face):
-    ''' we have around 60 points but we only want 17 so this function reduces it '''
-    # take one face, return the normalized data rather than directly modifying a dataframe
-    # we have 60 data points but we only want 17 so take about 1/3 of the points
-    range = 0.25
-    while get_number_points_face(face) > 17:
-        for x in face:
-            if get_number_points_face(face) <= 17:
-                break;
-            for y in x:
-                rand = np.random.uniform(0, 1)
-                if rand < range:
-                    x.remove(y)
-                    break
-    assert get_number_points_face(face) == 17
-    return face
-
-def get_number_points_face(face):
-    ''' returns the number of points on the face '''
-    i = 0
-    for x in face:
-        for y in x:
-            i += 1
-    return i
-
-def convert_double_array_to_single(double):
-    ''' Converts a two dimensional array to a one dimensional array '''
-    single = []
-    for x in double:
-        for y in x:
-            single.append(y)
-    return single;
-
+def plot_points(points):
+    """ given an arary of tuples of points, plots them all  """
+    x_vals = [x[0] for x in points]
+    y_vals = [x[1] for x in points]
+    plt.plot(x_vals, y_vals, 'or')
+    plt.show()
 
 # run all faces through this and get that data
 # use that to predict enveddubg cordinates
@@ -97,7 +72,5 @@ def distances(url):
     face = get_facial_landmarks(url)    # get landmarks
     face, names = sort_api_data(face)   # sort given deata
     face = normalize(face, names)       # normalize all facial data
-    face = reduce_data(face)            # reduce from 60 points to 17
-    face = convert_double_array_to_single(face) # transforms our array of arrays into a singular array of points
     distances = distance.pdist(face)    # distances between each point
     return distances
