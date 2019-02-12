@@ -42,7 +42,6 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
-*.ipynb
 nosetests.xml
 coverage.xml
 *.cover
@@ -73,6 +72,8 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+refactor.ipynb
+normalize.ipynb
 
 # IPython
 profile_default/
