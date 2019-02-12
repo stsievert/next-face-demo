@@ -1,6 +1,3 @@
-# A class designed to take the next-face-demo local, removing its reliance on
-# face++ for facial recognition
-
 import face_recognition
 import pandas as pd
 import numpy as np
@@ -8,19 +5,26 @@ from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import numpy.linalg as LA
 
+class FaceNotFoundException(Exception):
+    """ Error when API can not find a face """
+    pass
+
 def get_facial_landmarks(url):
-    ''' gets facial landmarks for an image at the given url '''
+    """
+    given a file system url, returns facial landmarks for image of a face at
+    said url
+    """
     image = face_recognition.load_image_file(url)
     landmarks = face_recognition.face_landmarks(image)
+
     if len(landmarks) == 0:
-        print("[FACEAPI] WARNING: No face found")
-        return {}
-    #import ipdb; ipdb.set_trace()
+        raise FaceNotFoundException()
+
     return face_recognition.face_landmarks(image)[0]
 
 def sort_api_data(x):
     #def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
-    ''' sorts API data according to the provided keys '''
+    """ sorts API data based on keys provided by the face finder api """
     keys = [
         "chin",
         "left_eyebrow",
@@ -35,11 +39,12 @@ def sort_api_data(x):
     y = [x[k] for k in keys]
     return y, keys
 
-# test this by ploting all the points from one face
-# then normalize it, and plot it again, it should be about the same then
 def normalize(face_, feature_names):
     # def normalize(face_: list[list[tuple]], feature_names: list[str]) -> list[tuple]:
-    """ normalizes all points on the face to be based around the nose """
+    """
+    normalizes all points on the face to take into account a different in
+    distance from the webcam for each person
+    """
     face = face_
 
     nose_points = face[feature_names.index("nose_tip")]
@@ -60,14 +65,10 @@ def normalize(face_, feature_names):
 
     return face_points
 
-# run all faces through this and get that data
-# use that to predict enveddubg cordinates
 def distances(url):
-    ''' gets distances of a face from a given url '''
+    """ gets distances of a face from a given url """
     face = get_facial_landmarks(url)    # get landmarks
-    if face != {}:
-        face, names = sort_api_data(face)   # sort given deata
-        face = normalize(face, names)       # normalize all facial data
-        distances = distance.pdist(face)    # distances between each point
-        return distances
-    return np.array([])
+    face, names = sort_api_data(face)   # sort given deata
+    face = normalize(face, names)       # normalize all facial data
+    distances = distance.pdist(face)    # distances between each point
+    return distances

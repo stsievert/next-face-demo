@@ -15,6 +15,7 @@ from bokeh.plotting import curdoc, figure
 from skimage.transform import resize as imresize
 from show_plot import generate_initial_plot, read_image
 from predict import predict
+from face_api_local import FaceNotFoundException
 
 # Interface setup ==============================================================
 
@@ -91,8 +92,8 @@ def callback(f):
         f.seek(0)
     try:
         y = predict('./webcam.png', verbose=True)
-    except Exception as exc:
-        print("[EXCEPTION] Face Processesing: " + str(exc))
+    except FaceNotFoundException as exc:
+        print("correct exception thrown")
         crop_image = False
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2
