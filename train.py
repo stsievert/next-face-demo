@@ -2,7 +2,7 @@ import json
 import pickle
 import loader
 import numpy as np
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, dump
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import LeaveOneOut
 from sklearn.linear_model import Lasso
@@ -38,7 +38,7 @@ def _trainModelForTrainTestSplit(train, test, data, results, model):
     model.fit(trainData, trainDataResults)
     return testData, testDataResults
 
-def trainModel(results, data, model):
+def train_model(results, data, model):
     y = results
     D = data
     model = model
@@ -62,10 +62,8 @@ def trainModel(results, data, model):
         distances.append(np.linalg.norm(y1[0] - res))
         angles.append(min(angle_between(y1[0], res), angle_between(res, y1[0])))
 
-    return distances, angles, changes
+    return model, distances, angles, changes
 
-def default():
-    data, results = loader.load_face_data()
-    distances, angles, changes = trainModel(results, data, Lasso(alpha=0.006))
-
-default()
+def dump_model_to_disk(model):
+    dump(model, "face_model.joblib")
+    

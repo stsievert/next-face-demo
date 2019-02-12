@@ -8,6 +8,11 @@ def graphMetrics(distances, angles, changes):
     and array of tuples for changes, this functions plots each of the given
     metrics
     """
+    
+    distances = np.array(distances)
+    
+    print("Average Distance: \t " + str(distances.mean()))
+    print("Mean Distance: \t\t " + str(np.median(distances)))
 
     plt.rcParams['figure.figsize'] = [10, 10]
 
@@ -34,14 +39,16 @@ def graphMetrics(distances, angles, changes):
         max_lines -= 1
 
     # set up second plot, angle histogram
-    plt.subplot(2,2,2)
+    axis = plt.subplot(2,2,2)
+    axis.set_ylim([0, 80])
     plt.hist(angles, bins=10)
     plt.xlabel('Angles')
     plt.ylabel('n');
     plt.title('angle difference between results/expected')
 
     # set up third plot, distance histogram
-    plt.subplot(2, 2, 3)
+    axis = plt.subplot(2, 2, 3)
+    axis.set_ylim([0, 50])
     plt.ylabel('n')
     plt.xlabel('Distance Real vs Actual')
     plt.title('distance between results/expected')
