@@ -18,7 +18,7 @@ from toolz import partial
 
 import face_api_local as face_api
 import get_words
-import train
+import train_util
 
 
 def read_image(
