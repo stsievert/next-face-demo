@@ -14,8 +14,7 @@ from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from skimage.transform import resize as imresize
 from show_plot import generate_initial_plot, read_image
-from predict import predict
-from face_api_local import FaceNotFoundException
+from face_api_local import FaceNotFoundException, predict
 
 # Interface setup ==============================================================
 
@@ -91,9 +90,9 @@ def callback(f):
         imageio.imwrite(f, img, format="png")
         f.seek(0)
     try:
-        y = predict('./webcam.png', verbose=True)
+        y = predict('./webcam.png')
     except FaceNotFoundException as exc:
-        print("correct exception thrown")
+        print("[ERROR] Face not found, making random guess")
         crop_image = False
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2

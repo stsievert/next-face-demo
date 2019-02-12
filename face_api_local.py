@@ -1,9 +1,10 @@
 import face_recognition
 import pandas as pd
 import numpy as np
-from scipy.spatial import distance
 import matplotlib.pyplot as plt
 import numpy.linalg as LA
+from joblib import load
+from scipy.spatial import distance
 
 class FaceNotFoundException(Exception):
     """ Error when API can not find a face """
@@ -72,3 +73,21 @@ def distances(url):
     face = normalize(face, names)       # normalize all facial data
     distances = distance.pdist(face)    # distances between each point
     return distances
+
+def predict(url):
+    """ predicts location for a face given a url """
+
+    # TODO: Only load the model on app load
+    model = load("face_model.joblib")
+
+    x = distances(url)
+
+    if len(x) == 0:
+        raise Exception("Face Not Found")
+
+    y = model.predict(x.reshape(1, -1))
+
+    if np.linalg.norm(y) > 1:
+        y /= np.linalg.norm(y)
+
+    return y.flat[:]
