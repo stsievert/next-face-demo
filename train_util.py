@@ -1,11 +1,7 @@
-import json
-import pickle
 import loader
 import numpy as np
-from joblib import Parallel, delayed, dump
-from sklearn.kernel_ridge import KernelRidge
+from joblib import dump
 from sklearn.model_selection import LeaveOneOut
-from sklearn.linear_model import Lasso
 
 # https://stackoverflow.com/questions/31735499/calculate-angle-clockwise-between-two-points
 def angle_between(p1, p2):
@@ -14,6 +10,10 @@ def angle_between(p1, p2):
     return np.rad2deg((ang1 - ang2) % (2 * np.pi))
 
 def _trainModelForTrainTestSplit(train, test, data, results, model):
+    """
+    trains the model for one set of a train test split
+    """
+
     trainData = []
     trainDataResults  = []
     testData = []
@@ -39,6 +39,10 @@ def _trainModelForTrainTestSplit(train, test, data, results, model):
     return testData, testDataResults
 
 def train_model(results, data, model):
+    """
+    Given expected results, dace data and a model this trains the model to the data
+    """
+
     y = results
     D = data
     model = model
@@ -65,5 +69,5 @@ def train_model(results, data, model):
     return model, distances, angles, changes
 
 def dump_model_to_disk(model):
+    """ saves model to disk """
     dump(model, "face_model.joblib")
-    

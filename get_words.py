@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 
-
 def find_words(y):
     df = pd.read_csv("./word-coords/words_2D_aligned_coarse.csv", index_col="word")
     df -= y

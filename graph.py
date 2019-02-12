@@ -2,15 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import LeaveOneOut
 
-def graphMetrics(distances, angles, changes):
+def graph_metrics(distances, angles, changes):
     """
     given an array of points for distances, an array of points for angles and
     and array of tuples for changes, this functions plots each of the given
     metrics
     """
-    
+
     distances = np.array(distances)
-    
+
     print("Average Distance: \t " + str(distances.mean()))
     print("Mean Distance: \t\t " + str(np.median(distances)))
 

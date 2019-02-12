@@ -1,10 +1,9 @@
 import graph
-import train
+import train_util as train
 
 def train_and_print_metrics(results, data, model):
     """
-    This is here just to make it simpler when training and instantly printing
-    the results
+    Trains the model and prints the metrics
     """
     model, distances, angles, changes = train.train_model(results, data, model)
-    graph.graphMetrics(distances, angles, changes)
+    graph.graph_metrics(distances, angles, changes)

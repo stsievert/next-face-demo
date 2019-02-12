@@ -2,7 +2,8 @@ import pandas as pd
 import face_api_local as face_api
 
 def load_face_data():
-    # get data and load it into a dataframe
+    """ loads face data into memory and returns the data and results """
+
     DIR = "./train-files/"
     y1 = pd.read_csv(DIR + "embedding.csv", index_col="Item")
 
