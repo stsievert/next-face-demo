@@ -91,11 +91,8 @@ def callback(f):
         f.seek(0)
     try:
         y = predict('./webcam.png', verbose=True)
-    except:
-        err = sys.exc_info()[0]
-        print("[MYAPP][CALLBACK] Error embedding face")
-        print("[MYAPP][CALLBACK] **** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
-        print("[MYAPP][CALLBACK] " + traceback.format_exc())
+    except Exception as exc:
+        print("[EXCEPTION] Face Processesing: " + str(exc))
         crop_image = False
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2

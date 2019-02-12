@@ -14,6 +14,7 @@ def get_facial_landmarks(url):
     landmarks = face_recognition.face_landmarks(image)
     if len(landmarks) == 0:
         print("[FACEAPI] WARNING: No face found")
+        return {}
     #import ipdb; ipdb.set_trace()
     return face_recognition.face_landmarks(image)[0]
 
@@ -64,7 +65,9 @@ def normalize(face_, feature_names):
 def distances(url):
     ''' gets distances of a face from a given url '''
     face = get_facial_landmarks(url)    # get landmarks
-    face, names = sort_api_data(face)   # sort given deata
-    face = normalize(face, names)       # normalize all facial data
-    distances = distance.pdist(face)    # distances between each point
-    return distances
+    if face != {}:
+        face, names = sort_api_data(face)   # sort given deata
+        face = normalize(face, names)       # normalize all facial data
+        distances = distance.pdist(face)    # distances between each point
+        return distances
+    return np.array([])
