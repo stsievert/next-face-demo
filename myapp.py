@@ -1,14 +1,7 @@
-import base64
-import io
-import os
-import sys
-import traceback
 import cv2
-import imageio
 import numpy as np
 import get_words
 import plot_util
-from PIL import Image
 from bokeh.layouts import column
 from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
 from bokeh.palettes import RdYlBu3
@@ -21,10 +14,9 @@ FIGURE_DIM = (1200, 800)    # Set up size of figure
 plot = generate_initial_plot(test=True, n_imgs=50, img_width=0.3, dim=FIGURE_DIM)  # plot
 
 # had to open in PIL to get a ndarray representation rather than iobuffer while also loading in RGBA color space
-im = Image.open('imgs/wanted.png')
-im = im.convert("RGBA")
-imarray = np.array(im)
-imarray = np.flipud(imarray)
+im = cv2.imread('imgs/wanted.png')
+im = cv2.cvtColor(im, cv2.COLOR_BGR2RGBA)
+imarray = np.flipud(im)
 
 # plot the image
 width = 0.3588 # 1.3 * 0.30 * 0.92
@@ -104,5 +96,3 @@ def setup():
     #webcam_callback()
 
 setup()
-
-#test_callback()
