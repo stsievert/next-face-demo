@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import get_words
 import plot_util
+import threading
+import time
 from bokeh.layouts import column
 from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
 from bokeh.palettes import RdYlBu3
@@ -14,6 +16,7 @@ from face_api_local import FaceNotFoundException, predict
 maxWebcamHeight=240
 figure_size=(1200, 800)
 continue_loop = False;
+loop_duration = 0.1
 take_picture_label = plot_util.make_take_picture_label()
 picture_stream_label = plot_util.make_steam_picture_label()
 
@@ -70,15 +73,26 @@ def callback(img_data):
     img_label.text = ", ".join(emotions)
     print("[MYAPP] Predicted emotions: ", emotions)
 
-def webcam_callback():
-    ''' grabs and modifys and image from the webcame to be used by the call back
+def webcam_callback(camera=None, delete_camera=True):
+    '''
+    grabs and modifys and image from the webcame to be used by the call back
     function. Potential for furthur speed increase if we can keep image in
-    memory the entire time rather than reading it from a file '''
+    memory the entire time rather than reading it from a file
+    - parameter camera: camera object to use
+    - parameter delete_camera: if you should delete camera after use
+    '''
 
     print("[MYAPP] Capturing image via webcam")
-    camera = cv2.VideoCapture(0)
+
+    camera = camera
+
+    if camera == None:
+        camera = cv2.VideoCapture(0)
+
     return_value, image = camera.read()
-    del(camera)
+
+    if delete_camera == True:
+        del(camera)
 
     callback(image)
 
@@ -108,10 +122,19 @@ def toggle_picture_stream():
         take_picture_label.disabled = True
         picture_stream_label.label = "End Image Stream"
         picture_stream_label.button_type = "danger"
+        # start loop back up
+        picture_stream_callback()
     else:
         take_picture_label.disabled = False
         picture_stream_label.label = "Start Image Stream"
         picture_stream_label.button_type = "primary"
+
+def picture_stream_callback():
+    """ Called once every time interval to continually update plot """
+    camera = cv2.VideoCapture(0)
+    while (continue_loop == True):
+        webcam_callback(camera, False)
+        time.sleep(loop_duration)
 
 
 def setup():
