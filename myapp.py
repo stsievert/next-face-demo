@@ -106,8 +106,12 @@ def toggle_picture_stream():
         # disable individual picture button so both are not running callbacks
         # at once
         take_picture_label.disabled = True
+        picture_stream_label.label = "End Image Stream"
+        picture_stream_label.button_type = "danger"
     else:
         take_picture_label.disabled = False
+        picture_stream_label.label = "Start Image Stream"
+        picture_stream_label.button_type = "primary"
 
 
 def setup():
