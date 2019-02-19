@@ -25,7 +25,6 @@ def process_image(img, imageHeight):
     - parameter imageHeight: height we want the image to be
     - returns: rgb and rgba representations of the image
     """
-
     # Image coming in is bigger than desired so reduce it to the inputed image height
     img = reduce_webcam_image(img, imageHeight)
     # RGB color channels are used for the face_recognition library

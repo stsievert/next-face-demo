@@ -9,6 +9,38 @@ from bokeh.plotting import curdoc, figure
 from show_plot import generate_initial_plot, read_image
 from face_api_local import FaceNotFoundException, predict
 
+# parameters ===================================================================
+
+maxWebcamHeight=240
+figure_size=(1200, 800)
+
+# general set up ===============================================================
+
+
+# create the plot in which we will act on
+plot = generate_initial_plot(test=True, n_imgs=50, img_width=0.3,
+                                                                dim=figure_size)
+
+# load the default/starting image and move it to RGBA (bokeh) color format
+# we must flip it because for some reason bokeh plots images upside down
+im = cv2.imread('imgs/wanted.png')
+im = cv2.cvtColor(im, cv2.COLOR_BGR2RGBA)
+imarray = np.flipud(im)
+e = plot.image_rgba(image=[imarray], x=[0], y=[0], dw=[0.3588], dh=[0.3588])
+
+# add the image label to the plot
+img_label = plot_util.make_image_label()
+plot.add_layout(img_label)
+ds = e.data_source
+
+# add a text renderer to our plot (no data yet)
+text_renderer = plot.text(x = [], y = [], text = [], text_color = [],
+             text_font_size="20pt", text_baseline="middle", text_align="center")
+
+
+# callbacks ====================================================================
+
+
 def callback(img_data):
     ''' Takes in an image file and then process it to be placed onto the map '''
 
@@ -47,50 +79,27 @@ def webcam_callback():
 
     callback(image)
 
-
 def test_callback():
     """
     if we call this in this script, we can run myapp.py on webcam.png without
     launching the entire bokeh program
+
+    If you want to have the program automatically predict a given face on launch
+    uncomment the last line in this file calling this function and then change
+    the file named 'test_callback.png' to your image of choice
     """
-    im = cv2.imread("test_callback.png", 0)     # loads in grayscale color space
-                                                # tried rgb but it failed for some reason with the error "RuntimeError: Unsupported image type, must be 8bit gray or RGB image."
-    # imRGB = cv2.cvtColor(im, cv2.COLOR_BGR2RGB) # now in rgb color space
+    im = cv2.imread("test_callback.png")
     print("[MYAPP][TEST] Processing image....")
     callback(im)
 
-def setup(maxWebcamHeight=240, figure_size=(1200, 800)):
+def setup():
     """
     General set up for the bokeh application
-    - parameter maxWebcamHeight: height for wecam images to be reduced down to
-    - parameter figure_size: size of the plot
     """
-
-    # create the plot in which we will act on
-    plot = generate_initial_plot(test=True, n_imgs=50, img_width=0.3, dim=figure_size)  # plot
-
-    # load the default/starting image and move it to RGBA (bokeh) color format
-    # we must flip it because for some reason bokeh plots images upside down
-    im = cv2.imread('imgs/wanted.png')
-    im = cv2.cvtColor(im, cv2.COLOR_BGR2RGBA)
-    imarray = np.flipud(im)
-
-    # plot the starting image
-    width = 0.3588 # 1.3 * 0.30 * 0.92
-    e = plot.image_rgba(image=[imarray], x=[0], y=[0], dw=[width], dh=[width])
-
-    # add the image label to the plot
-    img_label = plot_util.make_image_label()
-    plot.add_layout(img_label)
-    ds = e.data_source
-
-    # add a text renderer to our plot (no data yet)
-    text_renderer = plot.text(x = [], y = [], text = [], text_color = [], text_font_size="20pt", text_baseline="middle", text_align="center")
-
     # put the button and plot in a layout and add to the document
     take_picture_label = plot_util.make_take_picture_label()
     take_picture_label.on_click(webcam_callback)
     curdoc().add_root(column(take_picture_label, plot))
-    #webcam_callback()
 
 setup()
+#test_callback()
