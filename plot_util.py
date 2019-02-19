@@ -18,6 +18,10 @@ def make_take_picture_label():
     # makes the label that displays click to continue
     return Button(label="Take Picture via Webcam", button_type="success")
 
+def make_steam_picture_label():
+    # makes the label that displays click to continue
+    return Button(label="Start Image Stream", button_type="primary")
+
 def process_image(img, imageHeight):
     """
     Processes image for use in myapp.py

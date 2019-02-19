@@ -13,6 +13,9 @@ from face_api_local import FaceNotFoundException, predict
 
 maxWebcamHeight=240
 figure_size=(1200, 800)
+continue_loop = False;
+take_picture_label = plot_util.make_take_picture_label()
+picture_stream_label = plot_util.make_steam_picture_label()
 
 # general set up ===============================================================
 
@@ -92,14 +95,29 @@ def test_callback():
     print("[MYAPP][TEST] Processing image....")
     callback(im)
 
+def toggle_picture_stream():
+    """
+    Toggles if the program is continually looping images through
+    """
+    global continue_loop
+    continue_loop = not continue_loop
+
+    if continue_loop == True:
+        # disable individual picture button so both are not running callbacks
+        # at once
+        take_picture_label.disabled = True
+    else:
+        take_picture_label.disabled = False
+
+
 def setup():
     """
     General set up for the bokeh application
     """
     # put the button and plot in a layout and add to the document
-    take_picture_label = plot_util.make_take_picture_label()
     take_picture_label.on_click(webcam_callback)
-    curdoc().add_root(column(take_picture_label, plot))
+    picture_stream_label.on_click(toggle_picture_stream)
+    curdoc().add_root(column(take_picture_label, picture_stream_label, plot))
 
 setup()
 #test_callback()
