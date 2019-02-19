@@ -34,32 +34,28 @@ text_renderer = plot.text(x = [], y = [], text = [], text_color = [], text_font_
 def callback(img_data):
     ''' Takes in an image file and then process it to be placed onto the map '''
 
-    print("[MYAPP] Processing image callback")
     img_label.text = "Thinking..."
 
-    # what does this do?
-    if min(img_data.shape[:2]) > 512:
-        img_data = plot_util.reduce_image(img_data)
+    print("[MYAPP] Processing image")
+    img_rgb, img_rgba = plot_util.process_image(img_data, maxWebcamHeight)
 
+    print("[MYAPP] Attempting prediction")
     try:
-        print("[MYAPP] Attempting prediction")
-        y = predict(img_data)
+        y = predict(img_rgb)
+        print("[MYAPP] Prediction successful")
     except FaceNotFoundException as exc:
         print("[MYAPP] Face not found, making random guess")
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2
 
-    aspect_ratio = img_data.shape[0] / img_data.shape[1]
-
-    img_data_rgba = cv2.cvtColor(img_data, cv2.COLOR_RGB2RGBA)
-    img_data_rgba_flipped = np.flipud(img_data_rgba)
-    e.data_source.data.update(x = [y[0]], y = [y[1]], image = [img_data_rgba_flipped])
-
+    # update image on plot
+    e.data_source.data.update(x = [y[0]], y = [y[1]], image = [img_rgba])
+    # update image label
     emotions = get_words.find_words(y)
-    print("[MYAPP] Predicted emotions: ", emotions)
     img_label.x = y[0]
     img_label.y = y[1]
     img_label.text = ", ".join(emotions)
+    print("[MYAPP] Predicted emotions: ", emotions)
 
 def webcam_callback():
     ''' grabs and modifys and image from the webcame to be used by the call back
@@ -71,10 +67,7 @@ def webcam_callback():
     return_value, image = camera.read()
     del(camera)
 
-    print("[MYAPP] Reducing webcame image")
-    imgSmall = plot_util.reduce_webcam_image(image, maxWebcamHeight)
-    imgRGB = cv2.cvtColor(imgSmall, cv2.COLOR_BGR2RGB)
-    callback(imgRGB)
+    callback(image)
 
 
 def test_callback():

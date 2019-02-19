@@ -8,7 +8,7 @@ def make_image_label():
     return Label(
             x = 0,
             y = 0,
-            text = "Use button in upper left to upload",
+            text = "Take Picture",
             border_line_color = "red",
             border_line_alpha = 0.5,
             background_fill_color = "white",
@@ -18,13 +18,23 @@ def make_take_picture_label():
     # makes the label that displays click to continue
     return Button(label="Take Picture via Webcam", button_type="success")
 
-def reduce_image(img):
-    # if bigger than 512, reduce
-    scale = 512 / min(img.shape[:2])
-    _w, _h, _c = img.shape
-    out_shape = (int(_w * scale), int(_h * scale), _c)
-    img = imresize(img, out_shape, preserve_range=True).astype("uint8")
-    return img
+def process_image(img, imageHeight):
+    """
+    Processes image for use in myapp.py
+    - parameter img: BGR ndarray of image
+    - parameter imageHeight: height we want the image to be
+    - returns: rgb and rgba representations of the image
+    """
+
+    # Image coming in is bigger than desired so reduce it to the inputed image height
+    img = reduce_webcam_image(img, imageHeight)
+    # RGB color channels are used for the face_recognition library
+    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # RGBA color channels are used for the bokeh library, for some reason bokeh
+    # plots these images upside down, so we flip it here
+    imgRGBA = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+    imgRGBA = np.flipud(imgRGBA);
+    return imgRGB, imgRGBA
 
 def reduce_webcam_image(image, maxWebcamHeight):
     # reduce webcam to given size
@@ -32,14 +42,3 @@ def reduce_webcam_image(image, maxWebcamHeight):
     dim = (maxWebcamHeight, int(image.shape[0] * r)) # new dimension
     imgSmall = cv2.resize(image, dim, interpolation = cv2.INTER_AREA) # resize
     return imgSmall
-
-def change_color(img):
-    # not sure what this does exactly
-    shape = list(img.shape)
-    shape[-1] += 1
-    rgba = np.zeros(shape, dtype=img.dtype)
-    rgba[..., :3] = img
-    rgba[..., 3] = 255
-    img = rgba
-    img = img[::-1, :]
-    return img
