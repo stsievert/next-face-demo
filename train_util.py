@@ -12,6 +12,8 @@ def angle_between(p1, p2):
 def _trainModelForTrainTestSplit(train, test, data, results, model):
     """
     trains the model for one set of a train test split
+
+    note: not used in main application, only used to help choose model
     """
 
     trainData = []
@@ -41,6 +43,8 @@ def _trainModelForTrainTestSplit(train, test, data, results, model):
 def train_model(results, data, model):
     """
     Given expected results, dace data and a model this trains the model to the data
+
+    note: not used in main application, only used to help choose model
     """
 
     y = results
@@ -69,5 +73,9 @@ def train_model(results, data, model):
     return model, distances, angles, changes
 
 def dump_model_to_disk(model):
-    """ saves model to disk """
+    """
+    saves model to disk
+
+    note: not used in main application, only used to help choose model
+    """
     dump(model, "face_model.joblib")

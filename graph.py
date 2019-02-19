@@ -7,6 +7,8 @@ def graph_metrics(distances, angles, changes):
     given an array of points for distances, an array of points for angles and
     and array of tuples for changes, this functions plots each of the given
     metrics
+
+    note: not used in application itself, used to help with choosing model
     """
 
     distances = np.array(distances)
@@ -56,7 +58,11 @@ def graph_metrics(distances, angles, changes):
     plt.show()
 
 def plot_points(points):
-    """ given an arary of tuples of points, plots them all  """
+    """
+    given an arary of tuples of points, plots them all
+
+    note: not used in main application, only used to help choose model
+    """
     x_vals = [x[0] for x in points]
     y_vals = [x[1] for x in points]
     plt.plot(x_vals, y_vals, 'or')

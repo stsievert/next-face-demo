@@ -14,8 +14,7 @@ def get_facial_landmarks(img_data):
     """
     given a file system url, returns facial landmarks for image of a face at
     said url
-
-    img_data is of type ndarray
+    - parameter img_data: image data as ndarray in RGB color format
     """
     landmarks = face_recognition.face_landmarks(img_data)
 
