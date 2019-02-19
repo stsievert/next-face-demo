@@ -33,31 +33,29 @@ ds = e.data_source
 text_renderer = plot.text(x = [], y = [], text = [], text_color = [], text_font_size="20pt", text_baseline="middle", text_align="center")
 
 
-def callback(img):
+def callback(img_data):
     ''' Takes in an image file and then process it to be placed onto the map '''
 
     print("[MYAPP] Processing image callback")
     img_label.text = "Thinking..."
 
     # img = imageio.imread(f.read())
-    if img.shape[-1] == 3:
-        img = plot_util.change_color(img)
-    if min(img.shape[:2]) > 512:
-        img = plot_util.reduce_image(img)
+    if img_data.shape[-1] == 3:
+        print("changing color")
+        img_data = plot_util.change_color(img_data)
+    if min(img_data.shape[:2]) > 512:
+        img_data = plot_util.reduce_image(img_data)
 
-    with io.BytesIO() as f:
-        imageio.imwrite(f, img, format="png")
-        f.seek(0)
     try:
-        y = predict('./webcam.png')
+        y = predict(img_data)
     except FaceNotFoundException as exc:
         print("[MYAPP] Face not found, making random guess")
         crop_image = False
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2
 
-    aspect_ratio = img.shape[0] / img.shape[1]
-    e.data_source.data.update(x = [y[0]], y = [y[1]], image = [img])
+    aspect_ratio = img_data.shape[0] / img_data.shape[1]
+    e.data_source.data.update(x = [y[0]], y = [y[1]], image = [img_data])
 
     emotions = get_words.find_words(y)
     print("[MYAPP] Predicted emotions: ", emotions)
@@ -77,20 +75,21 @@ def webcam_callback():
 
     print("[MYAPP] Reducing webcame image")
     imgSmall = plot_util.reduce_webcam_image(image, maxWebcamHeight)
-    cv2.imwrite('webcam.png', imgSmall)
-    print(type(imgSmall), len(imgSmall), imgSmall)
+    imgSmallGray = cv2.cvtColor(imgSmall, cv2.COLOR_BGR2GRAY) # color channel not running correctly, use gray
 
-    with open("webcam.png", "rb") as f:
-        callback(f)
+    callback(imgSmallGray)
+
 
 def test_callback():
     """
     if we call this in this script, we can run myapp.py on webcam.png without
     launching the entire bokeh program
     """
-    with open("webcam.png", "rb") as f:
-        print("[MYAPP][TEST] Processing image....")
-        callback(f)
+    im = cv2.imread("test_callback.png", 0)     # loads in grayscale color space
+                                                # tried rgb but it failed for some reason with the error "RuntimeError: Unsupported image type, must be 8bit gray or RGB image."
+    # imRGB = cv2.cvtColor(im, cv2.COLOR_BGR2RGB) # now in rgb color space
+    print("[MYAPP][TEST] Processing image....")
+    callback(im)
 
 
 # put the button and plot in a layout and add to the document

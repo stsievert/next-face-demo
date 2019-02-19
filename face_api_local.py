@@ -10,18 +10,19 @@ class FaceNotFoundException(Exception):
     """ Error when API can not find a face """
     pass
 
-def get_facial_landmarks(url):
+def get_facial_landmarks(img_data):
     """
     given a file system url, returns facial landmarks for image of a face at
     said url
+
+    img_data is of type ndarray
     """
-    image = face_recognition.load_image_file(url)
-    landmarks = face_recognition.face_landmarks(image)
+    landmarks = face_recognition.face_landmarks(img_data)
 
     if len(landmarks) == 0:
         raise FaceNotFoundException()
 
-    return face_recognition.face_landmarks(image)[0]
+    return face_recognition.face_landmarks(img_data)[0]
 
 def sort_api_data(x):
     #def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
@@ -66,21 +67,21 @@ def normalize(face_, feature_names):
 
     return face_points
 
-def distances(url):
+def distances(img_data):
     """ gets distances of a face from a given url """
-    face = get_facial_landmarks(url)    # get landmarks
+    face = get_facial_landmarks(img_data)    # get landmarks
     face, names = sort_api_data(face)   # sort given deata
     face = normalize(face, names)       # normalize all facial data
     distances = distance.pdist(face)    # distances between each point
     return distances
 
-def predict(url):
+def predict(img_data):
     """ predicts location for a face given a url """
 
     # TODO: Only load the model on app load
     model = load("face_model.joblib")
 
-    x = distances(url)
+    x = distances(img_data)
 
     if len(x) == 0:
         raise Exception("Face Not Found")
