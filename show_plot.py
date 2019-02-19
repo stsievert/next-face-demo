@@ -4,7 +4,6 @@ import sys
 import time
 import traceback
 from datetime import datetime
-
 import numpy as np
 import pandas as pd
 from bokeh.client import push_session
@@ -12,22 +11,13 @@ from bokeh.driving import cosine
 from bokeh.models import Label
 from bokeh.plotting import curdoc, figure, output_file, show
 from imageio import imread
-from joblib import Parallel, delayed
 from scipy.misc import imresize
-from toolz import partial
-
 import face_api_local as face_api
 import get_words
 import train_util
 
 
-def read_image(
-    filename="faces/01F_DI_O.png",
-    percent_scale=0.5,
-    center=None,
-    width=None,
-    height=None,
-):
+def read_image(filename = "faces/01F_DI_O.png", percent_scale = 0.5, center = None, width = None, height = None):
     rgba = imread(filename).astype("uint8")
     if center and width and height:
         c = (int(center[0] * rgba.shape[0] / 100), int(center[1] * rgba.shape[1] / 100))
