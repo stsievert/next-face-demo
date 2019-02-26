@@ -18,11 +18,6 @@ from face_api_local import FaceNotFoundException, predict
 
 # parameters ===================================================================
 
-# look at passing webcam to python functhion through bokeh so it works on a web
-# server
-
-# pass javascript webcam image to boken to python
-
 maxWebcamHeight=240
 figure_size=(1200, 800)
 continue_loop = False;
@@ -36,18 +31,17 @@ process_webcam_label = plot_util.make_process_webcam_label()
 
 prime_javascript_webcam = CustomJS(args=dict(label=prime_webcam_label), code="""
 
-    //document.body = document.createElement("body");
     // canvas and context set up
     var canvas = document.createElement('CANVAS');
-    canvas.id = "test_123"
     document.body.appendChild(canvas);
+    canvas.style.visibility = "hidden";
     const context = canvas.getContext('2d');
-    //context.globalAlpha = 0.0;
     // video player
     var player = document.createElement('video');
     player.autoplay = true;
     player.load();
-    player.controls = true;
+    player.controls = false;
+    player.style.visibility = "hidden";
     document.body.appendChild(player);
     // buttons
     const captureButton = document.getElementById('capture');
