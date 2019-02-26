@@ -22,6 +22,14 @@ def make_steam_picture_label():
     # makes the label that displays click to continue
     return Button(label="Start Image Stream", button_type="primary")
 
+def make_prime_webcam_label():
+    # makes the label that displays click to continue
+    return Button(label="debug_PrimeWebcamJavascript", button_type="default")
+
+def make_process_webcam_label():
+    # makes the label that displays click to continue
+    return Button(label="debug_ProcessWebcamJavascript", button_type="default")
+
 def process_image(img, imageHeight):
     """
     Processes image for use in myapp.py

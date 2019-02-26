@@ -4,8 +4,13 @@ import get_words
 import plot_util
 import threading
 import time
+import base64
+import io
+from PIL import Image
+from bokeh import events
 from bokeh.layouts import column
 from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
+from bokeh.models.callbacks import CustomJS
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from show_plot import generate_initial_plot, read_image
@@ -13,12 +18,54 @@ from face_api_local import FaceNotFoundException, predict
 
 # parameters ===================================================================
 
+# look at passing webcam to python functhion through bokeh so it works on a web
+# server
+
+# pass javascript webcam image to boken to python
+
 maxWebcamHeight=240
 figure_size=(1200, 800)
 continue_loop = False;
 loop_duration = 0.1
 take_picture_label = plot_util.make_take_picture_label()
 picture_stream_label = plot_util.make_steam_picture_label()
+prime_webcam_label = plot_util.make_prime_webcam_label()
+process_webcam_label = plot_util.make_process_webcam_label()
+
+# javascript ===================================================================
+
+prime_javascript_webcam = CustomJS(args=dict(label=prime_webcam_label), code="""
+
+    //document.body = document.createElement("body");
+    // canvas and context set up
+    var canvas = document.createElement('CANVAS');
+    canvas.id = "test_123"
+    document.body.appendChild(canvas);
+    const context = canvas.getContext('2d');
+    //context.globalAlpha = 0.0;
+    // video player
+    var player = document.createElement('video');
+    player.autoplay = true;
+    player.load();
+    player.controls = true;
+    document.body.appendChild(player);
+    // buttons
+    const captureButton = document.getElementById('capture');
+    const saveButton = document.createElement("BUTTON");
+    document.body.appendChild(saveButton);
+    let image;
+
+    saveButton.addEventListener('click', () => {
+        context.drawImage(player, 0, 0, canvas.width, canvas.height);
+        image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    });
+
+    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        player.srcObject = stream;
+        setTimeout(function() { saveButton.click();label.label = image; console.log(image);}, 2000);
+    });
+
+""")
 
 # general set up ===============================================================
 
@@ -43,12 +90,13 @@ ds = e.data_source
 text_renderer = plot.text(x = [], y = [], text = [], text_color = [],
              text_font_size="20pt", text_baseline="middle", text_align="center")
 
-
 # callbacks ====================================================================
 
 
 def callback(img_data):
-    ''' Takes in an image file and then process it to be placed onto the map '''
+    ''' Takes in an image file and then process it to be placed onto the map
+        takes in BGR image
+    '''
 
     img_label.text = "Thinking..."
 
@@ -73,7 +121,7 @@ def callback(img_data):
     img_label.text = ", ".join(emotions)
     print("[MYAPP] Predicted emotions: ", emotions)
 
-def webcam_callback(camera=None, delete_camera=True):
+def server_webcam_callback(camera=None, delete_camera=True):
     '''
     grabs and modifys and image from the webcame to be used by the call back
     function. Potential for furthur speed increase if we can keep image in
@@ -95,6 +143,20 @@ def webcam_callback(camera=None, delete_camera=True):
         del(camera)
 
     callback(image)
+
+def javascript_webcam_callback(activateWebcam=False):
+    '''
+    javascript implementation of javascript webcam funcitonality
+    '''
+    print("[MYAPP] Capturing image via javascript webcam")
+
+    fullBase64 = prime_webcam_label.label
+    trimmedBase64 = fullBase64[len("data:image/octet-stream;base64,"):]
+    imgdata = base64.b64decode(trimmedBase64)
+    image = Image.open(io.BytesIO(imgdata))
+    numpImage = np.asarray(image)
+    numpImage = cv2.cvtColor(numpImage, cv2.COLOR_BGR2RGB)
+    callback(numpImage)
 
 def test_callback():
     """
@@ -133,7 +195,7 @@ def picture_stream_callback():
     """ Called once every time interval to continually update plot """
     camera = cv2.VideoCapture(0)
     while (continue_loop == True):
-        webcam_callback(camera, False)
+        server_webcam_callback(camera, False)
         time.sleep(loop_duration)
 
 
@@ -142,9 +204,11 @@ def setup():
     General set up for the bokeh application
     """
     # put the button and plot in a layout and add to the document
-    take_picture_label.on_click(webcam_callback)
+    take_picture_label.on_click(server_webcam_callback)
     picture_stream_label.on_click(toggle_picture_stream)
-    curdoc().add_root(column(take_picture_label, picture_stream_label, plot))
+    prime_webcam_label.js_on_event(events.ButtonClick, prime_javascript_webcam)
+    process_webcam_label.on_click(javascript_webcam_callback)
+    curdoc().add_root(column(take_picture_label, picture_stream_label, prime_webcam_label, process_webcam_label, plot))
 
 setup()
 #test_callback()
