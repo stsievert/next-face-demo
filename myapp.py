@@ -11,6 +11,7 @@ from bokeh import events
 from bokeh.layouts import column
 from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
 from bokeh.models.callbacks import CustomJS
+from bokeh.models.widgets import TextInput
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from show_plot import generate_initial_plot, read_image
@@ -18,6 +19,7 @@ from face_api_local import FaceNotFoundException, predict
 
 # parameters ===================================================================
 
+curdoc().title = "NEXT Face Demo"
 maxWebcamHeight=240
 figure_size=(1200, 800)
 continue_loop = False;
@@ -26,10 +28,11 @@ take_picture_label = plot_util.make_take_picture_label()
 picture_stream_label = plot_util.make_steam_picture_label()
 prime_webcam_label = plot_util.make_prime_webcam_label()
 process_webcam_label = plot_util.make_process_webcam_label()
+base64_label = plot_util.make_image_base_input()
 
 # javascript ===================================================================
 
-prime_javascript_webcam = CustomJS(args=dict(label=prime_webcam_label), code="""
+prime_javascript_webcam = CustomJS(args=dict(label=base64_label), code="""
 
     // canvas and context set up
     var canvas = document.createElement('CANVAS');
@@ -56,7 +59,7 @@ prime_javascript_webcam = CustomJS(args=dict(label=prime_webcam_label), code="""
 
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         player.srcObject = stream;
-        setTimeout(function() { saveButton.click();label.label = image; console.log(image);}, 2000);
+        setTimeout(function() { saveButton.click();label.value = image; console.log(image);}, 2000);
     });
 
 """)
@@ -144,7 +147,7 @@ def javascript_webcam_callback(activateWebcam=False):
     '''
     print("[MYAPP] Capturing image via javascript webcam")
 
-    fullBase64 = prime_webcam_label.label
+    fullBase64 = base64_label.value
     trimmedBase64 = fullBase64[len("data:image/octet-stream;base64,"):]
     imgdata = base64.b64decode(trimmedBase64)
     image = Image.open(io.BytesIO(imgdata))
@@ -202,7 +205,7 @@ def setup():
     picture_stream_label.on_click(toggle_picture_stream)
     prime_webcam_label.js_on_event(events.ButtonClick, prime_javascript_webcam)
     process_webcam_label.on_click(javascript_webcam_callback)
-    curdoc().add_root(column(take_picture_label, picture_stream_label, prime_webcam_label, process_webcam_label, plot))
+    curdoc().add_root(column(take_picture_label, picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
 
 setup()
 #test_callback()
