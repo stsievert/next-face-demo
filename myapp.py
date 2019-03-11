@@ -20,12 +20,24 @@ from face_api_local import FaceNotFoundException, predict
 # parameters ===================================================================
 
 curdoc().title = "NEXT Face Demo"
+
+"""
+By enabling cv2 capture, the program will attempt to capture webcam footage via
+the device webcam, which is much faster than utilizing the webpage's web cam
+because we do not have to communicate through javascript. However, this method
+does not work over the internet (it will try to use the server's webcam, not the
+users.)
+"""
+enable_cv2_capture = False
+
 maxWebcamHeight=240
 figure_size=(1200, 800)
 continue_loop = False;
 loop_duration = 0.1
-take_picture_label = plot_util.make_take_picture_label()
-picture_stream_label = plot_util.make_steam_picture_label()
+
+if enable_cv2_capture:
+    take_picture_label = plot_util.make_take_picture_label()
+    picture_stream_label = plot_util.make_steam_picture_label()
 prime_webcam_label = plot_util.make_prime_webcam_label()
 process_webcam_label = plot_util.make_process_webcam_label()
 base64_label = plot_util.make_image_base_input()
@@ -201,11 +213,15 @@ def setup():
     General set up for the bokeh application
     """
     # put the button and plot in a layout and add to the document
-    take_picture_label.on_click(server_webcam_callback)
-    picture_stream_label.on_click(toggle_picture_stream)
+    if enable_cv2_capture:
+        take_picture_label.on_click(server_webcam_callback)
+        picture_stream_label.on_click(toggle_picture_stream)
     prime_webcam_label.js_on_event(events.ButtonClick, prime_javascript_webcam)
     process_webcam_label.on_click(javascript_webcam_callback)
-    curdoc().add_root(column(take_picture_label, picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
+    if enable_cv2_capture:
+        curdoc().add_root(column(take_picture_label, picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
+    else:
+        curdoc().add_root(column(prime_webcam_label, process_webcam_label, base64_label, plot))
 
 setup()
 #test_callback()

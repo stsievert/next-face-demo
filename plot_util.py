@@ -25,11 +25,11 @@ def make_steam_picture_label():
 
 def make_prime_webcam_label():
     # makes the label that displays click to continue
-    return Button(label="[JavaScript] Take Picture via Webcam", button_type="default")
+    return Button(label="Take Picture via Webcam", button_type="success")
 
 def make_process_webcam_label():
     # makes the label that displays click to continue
-    return Button(label="[JavaScript] Process webcam image", button_type="default")
+    return Button(label="Process webcam image", button_type="primary")
 
 def make_image_base_input():
     return TextInput(value=default_base64, title="[JavaScript] Base64 Image Representation:");
