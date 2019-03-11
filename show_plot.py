@@ -77,7 +77,7 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
         dim = (int(height * 1.6), height)
     width, height = dim
     p = figure(plot_width=width, plot_height=height, x_range=x_lim, y_range=y_lim)
-    emotions = {"happy": (-1, -1), "calm": (-1, 1), "sad": (1, 0.5), "rage": (1, -1)}
+    emotions = {"happy": (-1, -1), "calm": (-1, 1), "sad": (0.25, 1.0), "rage": (1, -1), "anger": (1,0.5)}
     for emotion, (x, y) in emotions.items():
         w = Label(
             x=x,
