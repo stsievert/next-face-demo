@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 from bokeh.models import Label, Button
 from bokeh.models.widgets import TextInput
+#from CallbackTextInput import CallbackTextInput
 
 def make_image_label():
     # makes the label that will be displayed on top of the user image
@@ -29,10 +30,10 @@ def make_prime_webcam_label():
 
 def make_process_webcam_label():
     # makes the label that displays click to continue
-    return Button(label="Predict Emotion", button_type="primary")
+    return Button(label="Take Picture and Predict Emotion", button_type="primary")
 
 def make_image_base_input():
-    return TextInput(value=default_base64, title="[JavaScript] Base64 Image Representation:");
+    return TextInput(value=default_base64, title="[JavaScript] Base64 Image Representation:"); #Callback
 
 def process_image(img, imageHeight):
     """
