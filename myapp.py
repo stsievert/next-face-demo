@@ -51,6 +51,8 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label), code="""
     document.body.appendChild(canvas);
     canvas.style.visibility = "hidden";
     const context = canvas.getContext('2d');
+    context.canvas.width = 200;  // set to smaller size to reduce web trafic
+    context.canvas.height = 100; // set to smaller size to reduce web trafic
     // video player
     var player = document.createElement('video');
     player.autoplay = true;
@@ -71,7 +73,7 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label), code="""
 
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
         player.srcObject = stream;
-        setTimeout(function() { saveButton.click();label.value = image; console.log(image);}, 2000);
+        setTimeout(function() { saveButton.click();label.value = image; }, 2000);
     });
 
 """)
@@ -161,6 +163,7 @@ def javascript_webcam_callback(activateWebcam=False):
 
     fullBase64 = base64_label.value
     trimmedBase64 = fullBase64[len("data:image/octet-stream;base64,"):]
+    print("[JAVASCRIPT CALLBACK] Image Base 64 Len: " + str(len(trimmedBase64)))
     imgdata = base64.b64decode(trimmedBase64)
     image = Image.open(io.BytesIO(imgdata))
     numpImage = np.asarray(image)
@@ -182,6 +185,7 @@ def test_callback():
 
 def toggle_picture_stream():
     """
+    CV2
     Toggles if the program is continually looping images through
     """
     global continue_loop
@@ -201,7 +205,7 @@ def toggle_picture_stream():
         picture_stream_label.button_type = "primary"
 
 def picture_stream_callback():
-    """ Called once every time interval to continually update plot """
+    """ CV2 - Called once every time interval to continually update plot """
     camera = cv2.VideoCapture(0)
     while (continue_loop == True):
         server_webcam_callback(camera, False)
