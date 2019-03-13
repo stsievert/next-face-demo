@@ -8,7 +8,8 @@ import io
 from functools import partial
 from PIL import Image
 from bokeh import events
-from bokeh.layouts import column
+from bokeh.io import show
+from bokeh.layouts import column, row
 from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
 from bokeh.models.callbacks import CustomJS
 from bokeh.models.widgets import TextInput
@@ -295,7 +296,7 @@ def setup():
     if enable_cv2_capture:
         curdoc().add_root(column(take_picture_label, picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
     else:
-        curdoc().add_root(column(prime_webcam_label, process_webcam_label, plot))
+        curdoc().add_root(column(row(prime_webcam_label, process_webcam_label), plot))
 
 setup()
 #thread = Thread(target=begin_webcam_process_cycle)
