@@ -91,26 +91,29 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
     }
 
     saveButton.addEventListener('click', () => {
-        context.drawImage(player, 0, 0, canvas.width, canvas.height);
+        console.log("save button clicked, SHOULD be saving image");
+        context.drawImage(player, 0, 0, width, height);
         image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
     });
 
     if (sessionStorage.getItem('loop') === 'true') {
         navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+            player.srcObject = stream;
             var interval = setInterval(function() {
-                player.srcObject = stream;
-                setTimeout(function() {
-                    saveButton.click();
-                    label.value = image;
-                    console.log("Capturing Image");
-                    // use this to see if the loop should continue
-                    var cnt = sessionStorage.getItem('loop');
-                    if (cnt == 'false') {
-                        clearInterval(interval);
-                    }
-                }, 2000);
+                setTimeout(saveImage(), 2000);
             }, time);
         });
+    }
+
+    function saveImage() {
+        saveButton.click();
+        label.value = image;
+        console.log("Capturing Image");
+        // use this to see if the loop should continue
+        var cnt = sessionStorage.getItem('loop');
+        if (cnt == 'false') {
+            clearInterval(interval);    // chrome only saves if this code runs
+        }
     }
 """)
 
