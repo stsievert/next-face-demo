@@ -14,12 +14,6 @@ Using the iPython notebook `trainModel.ipynb` notebook, you can easily change th
 
 If you are interested in testing your model before use, there is another notebook file named `testModel.ipynb` that makes the process of testing models easy. Run the existing data load code at the top of the note book and then run `test.train_and_print_metrics(results, data, YOUR_MODEL_HERE)` to get metrics of how your model scores.
 
-## Browser Support
-Currently, Chrome is NOT working with this demo. The following browsers have been tested and confirmed working.
-
-- Safari
-- Firefox
-
 ## Dependencies
 
 - [face_recognition](https://github.com/ageitgey/face_recognition)
