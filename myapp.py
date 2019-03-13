@@ -51,14 +51,16 @@ process_webcam_label = plot_util.make_process_webcam_label()
 base64_label = plot_util.make_image_base_input()
 title_div = plot_util.make_title_div()
 description_div = plot_util.make_description_div()
+github_button = plot_util.make_github_botton()
 
 # load model
 load_model()
 
 # javascript ===================================================================
 
+# this is the javascript that takes a webcam image and saves it to the given label
+# this label is then capture via python as a way to communicate from javascript to python
 prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process_webcam_label, height=capture_height, width=capture_width, time=image_capture_rate), code="""
-
     // canvas and context set up
     var canvas = document.createElement('CANVAS');
     document.body.appendChild(canvas);
@@ -119,6 +121,8 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
         }
     }
 """)
+# used with open in github button
+open_github_javascript = CustomJS(code="window.open('https://github.com/stsievert/next-face-demo','_self');")
 
 # general set up ===============================================================
 
@@ -291,6 +295,7 @@ def setup():
     if enable_cv2_capture:
         take_picture_label.on_click(server_webcam_callback)
         picture_stream_label.on_click(toggle_picture_stream)
+    github_button.js_on_event(events.ButtonClick, open_github_javascript)
     prime_webcam_label.js_on_event(events.ButtonClick, prime_javascript_webcam)
     prime_webcam_label.on_click(prime_webcam_clicked)
     process_webcam_label.on_click(process_base64_image)
@@ -298,7 +303,7 @@ def setup():
     if enable_cv2_capture:
         curdoc().add_root(column(widgetbox(take_picture_label), picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
     else:
-        curdoc().add_root(column(column(title_div, description_div), row(prime_webcam_label, process_webcam_label), plot))
+        curdoc().add_root(column(column(title_div, description_div), row(prime_webcam_label, process_webcam_label, github_button), plot))
 
 setup()
 #thread = Thread(target=begin_webcam_process_cycle)

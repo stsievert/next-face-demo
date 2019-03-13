@@ -38,9 +38,12 @@ def make_image_base_input():
 
 def make_title_div():
     return Div(text="""<b style="color:black;font-size:500%;">NEXT Face Demo</b>""", width=1000, height=60)
+
 def make_description_div():
     return Div(text="""<font style="color:gray;font-size:150%;">Begin by starting the webcam. Once the webcam is started, take a picture and your emotion will be predicted and plotted on the map!</font>""", width=1500, height=10)
 
+def make_github_botton():
+    return Button(label="View on GitHub", button_type="default")
 
 def process_image(img, imageHeight):
     """
