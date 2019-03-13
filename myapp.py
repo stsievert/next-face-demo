@@ -9,7 +9,7 @@ from functools import partial
 from PIL import Image
 from bokeh import events
 from bokeh.io import show
-from bokeh.layouts import column, row
+from bokeh.layouts import column, row, widgetbox
 from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
 from bokeh.models.callbacks import CustomJS
 from bokeh.models.widgets import TextInput
@@ -49,6 +49,8 @@ if enable_cv2_capture:
 prime_webcam_label = plot_util.make_prime_webcam_label()
 process_webcam_label = plot_util.make_process_webcam_label()
 base64_label = plot_util.make_image_base_input()
+title_div = plot_util.make_title_div()
+description_div = plot_util.make_description_div()
 
 # load model
 load_model()
@@ -294,9 +296,9 @@ def setup():
     process_webcam_label.on_click(process_base64_image)
     process_webcam_label.disabled = True
     if enable_cv2_capture:
-        curdoc().add_root(column(take_picture_label, picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
+        curdoc().add_root(column(widgetbox(take_picture_label), picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
     else:
-        curdoc().add_root(column(row(prime_webcam_label, process_webcam_label), plot))
+        curdoc().add_root(column(column(title_div, description_div), row(prime_webcam_label, process_webcam_label), plot))
 
 setup()
 #thread = Thread(target=begin_webcam_process_cycle)

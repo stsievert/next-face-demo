@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import base64
 from bokeh.models import Label, Button
-from bokeh.models.widgets import TextInput
+from bokeh.models.widgets import TextInput, Div
 #from CallbackTextInput import CallbackTextInput
 
 def make_image_label():
@@ -35,6 +35,12 @@ def make_process_webcam_label():
 
 def make_image_base_input():
     return TextInput(value=default_base64, title="[JavaScript] Base64 Image Representation:"); #Callback
+
+def make_title_div():
+    return Div(text="""<b style="color:black;font-size:500%;">NEXT Face Demo</b>""", width=1000, height=60)
+def make_description_div():
+    return Div(text="""<font style="color:gray;font-size:150%;">Begin by starting the webcam. Once the webcam is started, take a picture and your emotion will be predicted and plotted on the map!</font>""", width=1500, height=10)
+
 
 def process_image(img, imageHeight):
     """
