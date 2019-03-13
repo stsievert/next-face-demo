@@ -6,7 +6,6 @@ import time
 import base64
 import io
 from functools import partial
-from threading import Thread
 from PIL import Image
 from bokeh import events
 from bokeh.layouts import column
@@ -18,7 +17,6 @@ from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from show_plot import generate_initial_plot, read_image
 from face_api_local import FaceNotFoundException, predict, load_model
-from tornado import gen
 
 # parameters ===================================================================
 
