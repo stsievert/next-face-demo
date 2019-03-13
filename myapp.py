@@ -173,7 +173,14 @@ def process_base64_image():
 
     global prev_image
     fullBase64 = base64_label.value
-    trimmedBase64 = fullBase64[len("data:image/octet-stream;base64,"):]
+    trimmedBase64 = fullBase64
+
+    # depending on how the base64 string was aqquired, we need to trime off the
+    # prefix
+    if trimmedBase64[:5] == "data:":
+        trimmedBase64 = fullBase64[len("data:image/octet-stream;base64,"):]
+    else:
+        trimmedBase64 = trimmedBase64[len("b'"):]
     if trimmedBase64 != prev_image:
         prev_image = trimmedBase64
         print("[MYAPP] Setting Base64 Image of Length: " + str(len(trimmedBase64)))
