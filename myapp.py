@@ -77,13 +77,18 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
     document.body.appendChild(saveButton);
     let image;
 
+    // clear storage on refresh
+    window.onbeforeunload = function(event) {
+        sessionStorage.clear();
+    };
+
     // if not there, add a false loop variable
-    if (localStorage.getItem('loop') === null) {
-        localStorage.setItem('loop', 'true');
-    } else if (localStorage.getItem('loop') === 'true') {
-        localStorage.setItem('loop', 'false');
+    if (sessionStorage.getItem('loop') === null) {
+        sessionStorage.setItem('loop', 'true');
+    } else if (sessionStorage.getItem('loop') === 'true') {
+        sessionStorage.setItem('loop', 'false');
     } else {
-        localStorage.setItem('loop', 'true');
+        sessionStorage.setItem('loop', 'true');
     }
 
     saveButton.addEventListener('click', () => {
@@ -91,7 +96,7 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
         image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
     });
 
-    if (localStorage.getItem('loop') === 'true') {
+    if (sessionStorage.getItem('loop') === 'true') {
         navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
             var interval = setInterval(function() {
                 player.srcObject = stream;
@@ -100,7 +105,7 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
                     label.value = image;
                     console.log("Capturing Image");
                     // use this to see if the loop should continue
-                    var cnt = localStorage.getItem('loop');
+                    var cnt = sessionStorage.getItem('loop');
                     if (cnt == 'false') {
                         clearInterval(interval);
                     }
@@ -108,10 +113,6 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
             }, time);
         });
     }
-""")
-
-end_javascript_webcam = CustomJS(args=dict(), code="""
-    window.localStorage.setItem('loop', false);
 """)
 
 # general set up ===============================================================
