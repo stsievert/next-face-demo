@@ -16,7 +16,7 @@ from bokeh.models.widgets import TextInput
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from show_plot import generate_initial_plot, read_image
-from face_api_local import FaceNotFoundException, predict
+from face_api_local import FaceNotFoundException, predict, load_model
 from tornado import gen
 
 # parameters ===================================================================
@@ -49,6 +49,9 @@ if enable_cv2_capture:
 prime_webcam_label = plot_util.make_prime_webcam_label()
 process_webcam_label = plot_util.make_process_webcam_label()
 base64_label = plot_util.make_image_base_input()
+
+# load model
+load_model()
 
 # javascript ===================================================================
 

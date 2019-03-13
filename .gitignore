@@ -115,3 +115,6 @@ dmypy.json
 # other
 todo.txt
 .DS_Store
+
+# ensure user generates joblib on their own machine
+*.joblib
