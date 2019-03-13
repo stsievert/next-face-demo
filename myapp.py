@@ -13,6 +13,7 @@ from bokeh.layouts import column
 from bokeh.models import Button, ColumnDataSource, CustomJS, Label, Text
 from bokeh.models.callbacks import CustomJS
 from bokeh.models.widgets import TextInput
+from bokeh.models.tools import SaveTool
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from show_plot import generate_initial_plot, read_image
@@ -121,6 +122,11 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
 # create the plot in which we will act on
 plot = generate_initial_plot(test=True, n_imgs=50, img_width=0.3,
                                                                 dim=figure_size)
+plot.toolbar.active_drag = None
+plot.toolbar.active_scroll = None
+plot.toolbar.active_tap = None
+plot.toolbar.logo = None
+plot.tools = [SaveTool()]
 
 # load the default/starting image and move it to RGBA (bokeh) color format
 # we must flip it because for some reason bokeh plots images upside down
