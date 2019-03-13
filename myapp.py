@@ -69,7 +69,7 @@ prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process
     player.load();
     player.controls = false;
     player.style.visibility = "hidden";
-    document.body.appendChild(player);
+    //document.body.appendChild(player);    // hidding this fixes a bug where page would extend every time a picture is taken
     // buttons
     const captureButton = document.getElementById('capture');
     const saveButton = document.createElement("BUTTON");
