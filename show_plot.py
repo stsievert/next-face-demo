@@ -127,7 +127,7 @@ def _update_plot():
     print("[PLOT] Uploading image...")
     try:
         y = predict(img_name, verbose=True)
-    except:
+    except FaceNotFoundException:
         err = sys.exc_info()[0]
         print("[PLOT] Error embedding face")
         print("[PLOT] **** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
