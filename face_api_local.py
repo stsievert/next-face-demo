@@ -10,15 +10,7 @@ class FaceNotFoundException(Exception):
     """ Error when API can not find a face """
     pass
 
-model = None
-
-def load_model():
-    """ loads model file and throws error if it does not exist """
-    global model
-    if os.path.isfile("./face_model.joblib"):
-        model = load("face_model.joblib")
-    else:
-        raise SystemExit("Model not found. face_model.joblib file is necessary but not found. Generate face_model.joblib by running the trainModel.ipynb notebook.")
+model = load("face_model.joblib")
 
 def get_facial_landmarks(img_data):
     """

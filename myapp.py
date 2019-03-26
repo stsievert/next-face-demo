@@ -17,7 +17,7 @@ from bokeh.models.tools import SaveTool
 from bokeh.palettes import RdYlBu3
 from bokeh.plotting import curdoc, figure
 from show_plot import generate_initial_plot, read_image
-from face_api_local import FaceNotFoundException, predict, load_model
+from face_api_local import FaceNotFoundException, predict
 
 # parameters ===================================================================
 
@@ -52,9 +52,6 @@ base64_label = plot_util.make_image_base_input()
 title_div = plot_util.make_title_div()
 description_div = plot_util.make_description_div()
 github_button = plot_util.make_github_botton()
-
-# load model
-load_model()
 
 # javascript ===================================================================
 
