@@ -1,0 +1,8 @@
+bokeh
+numpy
+matplotlib
+joblib
+scipy
+cv2
+pil
+face_recognition
