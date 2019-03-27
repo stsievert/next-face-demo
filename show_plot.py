@@ -4,7 +4,6 @@ import sys
 import time
 import traceback
 from datetime import datetime
-
 import numpy as np
 import pandas as pd
 from bokeh.client import push_session
@@ -12,22 +11,13 @@ from bokeh.driving import cosine
 from bokeh.models import Label
 from bokeh.plotting import curdoc, figure, output_file, show
 from imageio import imread
-from joblib import Parallel, delayed
 from scipy.misc import imresize
-from toolz import partial
-
-import face_api
+import face_api_local as face_api
 import get_words
-import train
+import train_util
 
 
-def read_image(
-    filename="faces/01F_DI_O.png",
-    percent_scale=0.5,
-    center=None,
-    width=None,
-    height=None,
-):
+def read_image(filename = "faces/01F_DI_O.png", percent_scale = 0.5, center = None, width = None, height = None):
     rgba = imread(filename).astype("uint8")
     if center and width and height:
         c = (int(center[0] * rgba.shape[0] / 100), int(center[1] * rgba.shape[1] / 100))
@@ -39,10 +29,10 @@ def read_image(
         horiz = np.clip(horiz, 0, rgba.shape[0])
         vert = np.clip(vert, 0, rgba.shape[1])
 
-        print("--------------")
-        print(rgba.shape)
+        print("[PLOT] --------------")
+        print("[PLOT] " + rgba.shape)
         # rgba = rgba[horiz[0]:horiz[1], vert[0]:vert[1]]
-        print(rgba.shape)
+        print("[PLOT] " + rgba.shape)
     else:
         rgba = imresize(rgba, percent_scale)
 
@@ -87,7 +77,7 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
         dim = (int(height * 1.6), height)
     width, height = dim
     p = figure(plot_width=width, plot_height=height, x_range=x_lim, y_range=y_lim)
-    emotions = {"happy": (-1, -1), "calm": (-1, 1), "sad": (1, 0.5), "rage": (1, -1)}
+    emotions = {"happy": (-1, -1), "calm": (-1, 1), "sad": (0.25, 1.0), "rage": (1, -1), "anger": (1,0.5)}
     for emotion, (x, y) in emotions.items():
         w = Label(
             x=x,
@@ -118,24 +108,8 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
     return p
 
 
-def predict(url, verbose=False):
-    if verbose:
-        print("Entering show_plot.predict")
-        print("Finding face feature vectors...")
-    x = face_api.distances(url)
-    if verbose:
-        print("Model predicting...")
-    y = train.model.predict(x.reshape(1, -1))
-    if np.linalg.norm(y) > 1:
-        y /= np.linalg.norm(y)
-    # y = np.clip(y, -1, 1)
-    if verbose:
-        print("Exiting show_plot.predict")
-    return y.flat[:]
-
-
 def update_plot(img_name="webcam.png"):
-    print("Press {enter, space} to read webcam.png")
+    print("[PLOT] Press {enter, space} to read webcam.png")
     #  getch = Getch()
     #  key = ord(getch())  # input()
     if key in {13, 32}:
@@ -150,26 +124,26 @@ def _update_plot():
     crop_image = True
     img = read_image(img_name)
     img = img[::-1, :]
-    print("Uploading image...")
+    print("[PLOT] Uploading image...")
     try:
         y = predict(img_name, verbose=True)
-    except:
+    except FaceNotFoundException:
         err = sys.exc_info()[0]
-        print("Error embedding face")
-        print("**** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
-        print(traceback.format_exc())
+        print("[PLOT] Error embedding face")
+        print("[PLOT] **** EXCEPTION! show_plot.py#L95, error = \n{}".format(err))
+        print("[PLOT] " + traceback.format_exc())
         crop_image = False
         y = np.random.randn(2)
         y /= np.linalg.norm(y) * 2
-    print("Finding the words...")
+    print("[PLOT] Finding the words...")
     words = get_words.find_words(y)
-    print(words)
+    print("[PLOT] " + words)
     # ds_words.data.update(x=y[0], y=y[1], text=", ".join(words))
     w.x = y[0]
     w.y = y[1]
     w.text = ", ".join(words)
     ds.data.update(x=[y[0]], y=[y[1]], image=[img])
-    print(y, w)
+    print("[PLOT] " + y, w)
 
 
 if __name__ == "__main__":

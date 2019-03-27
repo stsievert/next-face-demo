@@ -72,6 +72,8 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+refactor.ipynb
+normalize.ipynb
 
 # IPython
 profile_default/
@@ -110,3 +112,6 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# other
+todo.txt
+.DS_Store
