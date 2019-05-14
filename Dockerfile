@@ -48,4 +48,4 @@ EXPOSE 5006
 
 # Launch app using default headers (for SSL purposes) and enabling connections from
 # anywhere
-CMD ["bokeh", "serve", "myapp.py", "--use-xheaders", "--allow-websocket-origin=*"]
+CMD ["bokeh", "serve", "./face_demo/main.py", "--use-xheaders", "--allow-websocket-origin=*"]
