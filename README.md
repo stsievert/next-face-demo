@@ -6,7 +6,7 @@ This is a demo guesses the facial emotion of the user and maps it against a faci
 
 ## Run the demo
 
-To run the webserver, run
+To run the webserver, download and run the docker image from docker hub at  `joeholt/next_face_demo:latest`:
 
 `docker run -p XXXX:5006 joeholt/next_face_demo:latest`
 
