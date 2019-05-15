@@ -7,7 +7,9 @@ This is a demo guesses the facial emotion of the user and maps it against a faci
 ## Run the demo
 
 To run the webserver, run
+
 `docker run -p XXXX:5006 joeholt/next_face_demo:latest`
+
 This will launch a webserver listening on port XXXX of your local machine.
 
 ## Development Requirements
