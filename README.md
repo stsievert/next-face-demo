@@ -15,5 +15,5 @@ This will launch a webserver listening on port XXXX of your local machine.
 ## Development Requirements
 
 1. Download Anaconda
-2. Install dlib
+2. Install dlib (instructions for install: https://github.com/ageitgey/face_recognition#installation-options)
 3. Run `pip install requirements.txt`
