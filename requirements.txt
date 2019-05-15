@@ -3,6 +3,6 @@ numpy
 matplotlib
 joblib
 scipy
-cv2
-pil
+opencv-python
+pillow
 face_recognition
