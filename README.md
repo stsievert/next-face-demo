@@ -20,10 +20,13 @@ This repo contains a model.joblib file that contains a trained estimator. To tra
 ## Docker
 
 Run the demo via docker by running the following command:
-`docker run -p 5006:5006 joeholt/next_face_demo:latest`
+
+``` shell
+docker run -p 5006:5006 ./next_face_demo:latest
+```
 
 ## How to train custom model
-Using the iPython notebook `trainModel.ipynb` notebook, you can easily change the model to you liking. Change the line `model = ...` and redump the model to disk and the program will automatically use this new model.
+Using the IPython notebook `trainModel.ipynb` notebook, you can easily change the model to you liking. Change the line `model = ...` and redump the model to disk and the program will automatically use this new model.
 
 If you are interested in testing your model before use, there is another notebook file named `testModel.ipynb` that makes the process of testing models easy. Run the existing data load code at the top of the note book and then run `test.train_and_print_metrics(results, data, YOUR_MODEL_HERE)` to get metrics of how your model scores.
 
