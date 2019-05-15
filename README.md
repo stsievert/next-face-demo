@@ -17,6 +17,11 @@ This repo contains a model.joblib file that contains a trained estimator. To tra
 1. Start the demo with `bokeh serve face_demo`.
 2. Visit `http://localhost:5006/face_demo` (or wherever Bokeh directs you).
 
+## Docker
+
+Run the demo via docker by running the following command:
+`docker run joeholt/next_face_demo:latest`
+
 ## How to train custom model
 Using the iPython notebook `trainModel.ipynb` notebook, you can easily change the model to you liking. Change the line `model = ...` and redump the model to disk and the program will automatically use this new model.
 
