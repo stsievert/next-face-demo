@@ -5,7 +5,9 @@ import plot_util
 import time
 import base64
 import io
+import threading
 from functools import partial
+from tornado.ioloop import PeriodicCallback
 from PIL import Image
 from bokeh import events
 from bokeh.io import show
@@ -23,15 +25,6 @@ from face_api_local import FaceNotFoundException, predict
 
 curdoc().title = "NEXT Face Demo"
 
-"""
-By enabling cv2 capture, the program will attempt to capture webcam footage via
-the device webcam, which is much faster than utilizing the webpage's web cam
-because we do not have to communicate through javascript. However, this method
-does not work over the internet (it will try to use the server's webcam, not the
-users.)
-"""
-enable_cv2_capture = True
-
 maxWebcamHeightCV2=240      # used for cv2
 image_capture_rate = 500.0    # take an image ever n milliseconds
 image_process_rate = 2000.0    # process image in python ever n seconds
@@ -42,87 +35,12 @@ continue_loop = False; # NOT a config variable
 loop_duration = 0.5
 prev_image = ""             # previously processed image
 doc = curdoc()
+camera = cv2.VideoCapture(0)
 
-if enable_cv2_capture:
-    take_picture_label = plot_util.make_take_picture_label()
-    picture_stream_label = plot_util.make_steam_picture_label()
-prime_webcam_label = plot_util.make_prime_webcam_label()
-process_webcam_label = plot_util.make_process_webcam_label()
-base64_label = plot_util.make_image_base_input()
+take_picture_label = plot_util.make_take_picture_label()
+picture_stream_label = plot_util.make_steam_picture_label()
 title_div = plot_util.make_title_div()
 description_div = plot_util.make_description_div()
-github_button = plot_util.make_github_botton()
-
-# javascript ===================================================================
-
-# this is the javascript that takes a webcam image and saves it to the given label
-# this label is then capture via python as a way to communicate from javascript to python
-prime_javascript_webcam = CustomJS(args=dict(label=base64_label, process=process_webcam_label, height=capture_height, width=capture_width, time=image_capture_rate), code="""
-    // canvas and context set up
-    var canvas = document.createElement('CANVAS');
-    document.body.appendChild(canvas);
-    canvas.style.visibility = "hidden";
-    const context = canvas.getContext('2d');
-    context.canvas.width = width;  // set to smaller size to reduce web trafic
-    context.canvas.height = height; // set to smaller size to reduce web trafic
-    // video player
-    var player = document.createElement('video');
-    player.autoplay = true;
-    player.load();
-    player.controls = false;
-    player.style.visibility = "hidden";
-    //document.body.appendChild(player);    // hidding this fixes a bug where page would extend every time a picture is taken
-    // buttons
-    const captureButton = document.getElementById('capture');
-    const saveButton = document.createElement("BUTTON");
-    document.body.appendChild(saveButton);
-    let image;
-
-    // clear storage on refresh
-    window.onbeforeunload = function(event) {
-        sessionStorage.clear();
-    };
-
-    // if not there, add a false loop variable
-    if (sessionStorage.getItem('loop') === null) {
-        sessionStorage.setItem('loop', 'true');
-    } else if (sessionStorage.getItem('loop') === 'true') {
-        sessionStorage.setItem('loop', 'false');
-    } else {
-        sessionStorage.setItem('loop', 'true');
-    }
-
-    saveButton.addEventListener('click', () => {
-        console.log("save button clicked, SHOULD be saving image");
-        context.drawImage(player, 0, 0, width, height);
-        image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-    });
-
-    if (sessionStorage.getItem('loop') === 'true') {
-        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-            player.srcObject = stream;
-            var interval = setInterval(function() {
-                setTimeout(saveImage(), 2000);
-            }, time);
-        });
-    }
-
-    function saveImage() {
-        saveButton.click();
-        label.value = image;
-        console.log("Capturing Image");
-        // use this to see if the loop should continue
-        var cnt = sessionStorage.getItem('loop');
-        if (cnt == 'false') {
-            clearInterval(interval);    // chrome only saves if this code runs
-        }
-    }
-""")
-# used with open in github button
-open_github_javascript = CustomJS(code="window.open('https://github.com/stsievert/next-face-demo','_self');")
-
-# general set up ===============================================================
-
 
 # create the plot in which we will act on
 plot = generate_initial_plot(test=True, n_imgs=50, img_width=0.3,
@@ -180,46 +98,7 @@ def callback(img_data):
     img_label.text = ", ".join(emotions)
     print("[MYAPP] Predicted emotions: ", emotions)
 
-def process_base64_image():
-    '''
-    processes javascript image in the base64 label
-    '''
-    print("[MYAPP] Capturing image via javascript webcam")
-
-    global prev_image
-    fullBase64 = base64_label.value
-    trimmedBase64 = fullBase64
-
-    # depending on how the base64 string was aqquired, we need to trime off the
-    # prefix
-    if trimmedBase64[:5] == "data:":
-        trimmedBase64 = fullBase64[len("data:image/octet-stream;base64,"):]
-    else:
-        trimmedBase64 = trimmedBase64[len("b'"):]
-    if trimmedBase64 != prev_image:
-        prev_image = trimmedBase64
-        print("[MYAPP] Setting Base64 Image of Length: " + str(len(trimmedBase64)))
-        imgdata = base64.b64decode(trimmedBase64)
-        image = Image.open(io.BytesIO(imgdata))
-        numpImage = np.asarray(image)
-        numpImage = cv2.cvtColor(numpImage, cv2.COLOR_BGR2RGB)
-        callback(numpImage)
-    else:
-        print("[MYAPP] Image not changed, not further work being done")
-
-def prime_webcam_clicked():
-    """ primes a the webcam python call back, change button """
-    if prime_webcam_label.button_type == "danger":
-        prime_webcam_label.label = "Start"
-        prime_webcam_label.button_type = "success"
-        process_webcam_label.disabled = True
-    else:
-        prime_webcam_label.label = "Stop Webcam"
-        prime_webcam_label.button_type = "danger"
-        process_webcam_label.disabled = False
-
-
-def server_webcam_callback(camera=None, delete_camera=True):
+def server_webcam_callback(delete_camera=True):
     '''
     CV2
     grabs and modifys and image from the webcame to be used by the call back
@@ -231,7 +110,7 @@ def server_webcam_callback(camera=None, delete_camera=True):
 
     print("[MYAPP] Capturing image via webcam")
 
-    camera = camera
+    global camera
 
     if camera == None:
         camera = cv2.VideoCapture(0)
@@ -243,25 +122,14 @@ def server_webcam_callback(camera=None, delete_camera=True):
 
     callback(image)
 
-def test_callback():
-    """
-    if we call this in this script, we can run myapp.py on webcam.png without
-    launching the entire bokeh program
-
-    If you want to have the program automatically predict a given face on launch
-    uncomment the last line in this file calling this function and then change
-    the file named 'test_callback.png' to your image of choice
-    """
-    im = cv2.imread("test_callback.png")
-    print("[MYAPP][TEST] Processing image....")
-    callback(im)
-
 def toggle_picture_stream():
     """
     CV2
     Toggles if the program is continually looping images through
     """
     global continue_loop
+    global take_picture_label
+    global picture_stream_label
     continue_loop = not continue_loop
 
     if continue_loop == True:
@@ -277,12 +145,12 @@ def toggle_picture_stream():
         picture_stream_label.label = "[OpenCV] Start Image Stream"
         picture_stream_label.button_type = "primary"
 
-def picture_stream_callback():
-    """ CV2 - Called once every time interval to continually update plot """
-    camera = cv2.VideoCapture(0)
-    while (continue_loop == True):
-        server_webcam_callback(camera, False)
-        time.sleep(loop_duration)
+def update():
+    """
+    Updates display with conntinuous webcam input
+    """
+    if continue_loop:
+        server_webcam_callback(False)
 
 
 def setup():
@@ -290,20 +158,9 @@ def setup():
     General set up for the bokeh application
     """
     # put the button and plot in a layout and add to the document
-    if enable_cv2_capture:
-        take_picture_label.on_click(server_webcam_callback)
-        picture_stream_label.on_click(toggle_picture_stream)
-    github_button.js_on_event(events.ButtonClick, open_github_javascript)
-    prime_webcam_label.js_on_event(events.ButtonClick, prime_javascript_webcam)
-    prime_webcam_label.on_click(prime_webcam_clicked)
-    process_webcam_label.on_click(process_base64_image)
-    process_webcam_label.disabled = True
-    if enable_cv2_capture:
-        curdoc().add_root(column(title_div, description_div, picture_stream_label, take_picture_label, base64_label, plot))
-    else:
-        curdoc().add_root(column(column(title_div, description_div), row(prime_webcam_label, process_webcam_label, github_button), plot))
+    take_picture_label.on_click(server_webcam_callback)
+    picture_stream_label.on_click(toggle_picture_stream)
+    curdoc().add_root(column(title_div, description_div, picture_stream_label, take_picture_label, plot))
+    curdoc().add_periodic_callback(update, loop_duration)
 
 setup()
-#thread = Thread(target=begin_webcam_process_cycle)
-#thread.start()
-#test_callback()
