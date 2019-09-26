@@ -30,7 +30,7 @@ because we do not have to communicate through javascript. However, this method
 does not work over the internet (it will try to use the server's webcam, not the
 users.)
 """
-enable_cv2_capture = False
+enable_cv2_capture = True
 
 maxWebcamHeightCV2=240      # used for cv2
 image_capture_rate = 500.0    # take an image ever n milliseconds
@@ -38,8 +38,8 @@ image_process_rate = 2000.0    # process image in python ever n seconds
 capture_height = 100         # these two are used for the general javascript capture
 capture_width = 200
 figure_size=(1200, 800)
-continue_loop = False;
-loop_duration = 0.1
+continue_loop = False; # NOT a config variable
+loop_duration = 0.5
 prev_image = ""             # previously processed image
 doc = curdoc()
 
@@ -221,6 +221,7 @@ def prime_webcam_clicked():
 
 def server_webcam_callback(camera=None, delete_camera=True):
     '''
+    CV2
     grabs and modifys and image from the webcame to be used by the call back
     function. Potential for furthur speed increase if we can keep image in
     memory the entire time rather than reading it from a file
@@ -267,13 +268,13 @@ def toggle_picture_stream():
         # disable individual picture button so both are not running callbacks
         # at once
         take_picture_label.disabled = True
-        picture_stream_label.label = "End Image Stream"
+        picture_stream_label.label = "[OpenCV] End Image Stream"
         picture_stream_label.button_type = "danger"
         # start loop back up
         picture_stream_callback()
     else:
         take_picture_label.disabled = False
-        picture_stream_label.label = "Start Image Stream"
+        picture_stream_label.label = "[OpenCV] Start Image Stream"
         picture_stream_label.button_type = "primary"
 
 def picture_stream_callback():
@@ -298,7 +299,7 @@ def setup():
     process_webcam_label.on_click(process_base64_image)
     process_webcam_label.disabled = True
     if enable_cv2_capture:
-        curdoc().add_root(column(widgetbox(take_picture_label), picture_stream_label, prime_webcam_label, process_webcam_label, base64_label, plot))
+        curdoc().add_root(column(title_div, description_div, picture_stream_label, take_picture_label, base64_label, plot))
     else:
         curdoc().add_root(column(column(title_div, description_div), row(prime_webcam_label, process_webcam_label, github_button), plot))
 
