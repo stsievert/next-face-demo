@@ -6,6 +6,7 @@ import time
 import base64
 import io
 import threading
+import time
 from functools import partial
 from tornado.ioloop import PeriodicCallback
 from PIL import Image
@@ -32,10 +33,16 @@ capture_height = 100         # these two are used for the general javascript cap
 capture_width = 200
 figure_size=(1200, 800)
 continue_loop = False; # NOT a config variable
-loop_duration = 0.5
+loop_duration = 0.1
 prev_image = ""             # previously processed image
 doc = curdoc()
 camera = cv2.VideoCapture(0)
+last_update = time.time()
+map_to_circle = True
+avg_pts = True
+circle_map = lambda x, y: x / ((x**2 + y**2)**0.5)
+x_hist = []
+y_hist = []
 
 take_picture_label = plot_util.make_take_picture_label()
 picture_stream_label = plot_util.make_steam_picture_label()
@@ -70,35 +77,51 @@ text_renderer = plot.text(x = [], y = [], text = [], text_color = [],
 # callbacks ====================================================================
 
 
-def callback(img_data):
+def callback(img_data, stream=True):
     ''' Takes in an image file and then process it to be placed onto the map
         takes in BGR image
     '''
-
-    img_label.text = "Thinking..."
 
     print("[MYAPP] Processing image")
     img_rgb, img_rgba = plot_util.process_image(img_data, maxWebcamHeightCV2)
 
     print("[MYAPP] Attempting prediction")
+    face_found = True
     try:
-        y = predict(img_rgb)
+        y = predict(img_rgb, False)
         print("[MYAPP] Prediction successful")
     except FaceNotFoundException as exc:
         print("[MYAPP] Face not found, making random guess")
-        y = np.random.randn(2)
-        y /= np.linalg.norm(y) * 2
+        y = [0, 0]
+        face_found = False
 
+    xv = y[0]
+    yv = y[1]
+    if face_found and stream == True:
+        x_hist.append(xv)
+        y_hist.append(yv)
+        if len(x_hist) > 10:
+            x_hist.pop(0)
+        if len(y_hist) > 10:
+            y_hist.pop(0)
+    if (avg_pts and face_found == True and stream == True):
+       xv = sum(x_hist) / float(len(x_hist)) 
+       yv = sum(y_hist) / float(len(y_hist)) 
+    if map_to_circle and face_found == True:
+        xv = circle_map(xv, yv)
+        yv = circle_map(yv, xv)
     # update image on plot
-    e.data_source.data.update(x = [y[0]], y = [y[1]], image = [img_rgba])
+    e.data_source.data.update(x = [xv], y = [yv], image = [img_rgba])
     # update image label
     emotions = get_words.find_words(y)
-    img_label.x = y[0]
-    img_label.y = y[1]
+    img_label.x = xv
+    img_label.y = yv
     img_label.text = ", ".join(emotions)
+    if not face_found:
+        img_label.text = " "
     print("[MYAPP] Predicted emotions: ", emotions)
 
-def server_webcam_callback(delete_camera=True):
+def server_webcam_callback(delete_camera=False, stream=False):
     '''
     CV2
     grabs and modifys and image from the webcame to be used by the call back
@@ -112,7 +135,7 @@ def server_webcam_callback(delete_camera=True):
 
     global camera
 
-    if camera == None:
+    if camera is None:
         camera = cv2.VideoCapture(0)
 
     return_value, image = camera.read()
@@ -120,7 +143,7 @@ def server_webcam_callback(delete_camera=True):
     if delete_camera == True:
         del(camera)
 
-    callback(image)
+    callback(image, stream)
 
 def toggle_picture_stream():
     """
@@ -136,21 +159,25 @@ def toggle_picture_stream():
         # disable individual picture button so both are not running callbacks
         # at once
         take_picture_label.disabled = True
-        picture_stream_label.label = "[OpenCV] End Image Stream"
+        picture_stream_label.label = "End Image Stream"
         picture_stream_label.button_type = "danger"
         # start loop back up
         picture_stream_callback()
     else:
         take_picture_label.disabled = False
-        picture_stream_label.label = "[OpenCV] Start Image Stream"
+        picture_stream_label.label = "Start Image Stream"
         picture_stream_label.button_type = "primary"
+        x_hist = []
+        y_hist = []
 
 def update():
     """
     Updates display with conntinuous webcam input
     """
-    if continue_loop:
-        server_webcam_callback(False)
+    global last_update
+    if continue_loop and time.time() - last_update > loop_duration:
+        last_update = time.time()
+        server_webcam_callback(False, True)
 
 
 def setup():

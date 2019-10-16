@@ -15,6 +15,8 @@ def graph_metrics(distances, angles, changes):
 
     print("Average Distance: \t " + str(distances.mean()))
     print("Mean Distance: \t\t " + str(np.median(distances)))
+    print("Mean Angle Delta: \t\t " + str(np.mean(angles)))
+    print("Median Angle Delta:\t\t " + str(np.median(angles)))
 
     plt.rcParams['figure.figsize'] = [10, 10]
 
