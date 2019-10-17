@@ -17,7 +17,13 @@ import get_words
 import train_util
 
 
-def read_image(filename = "faces/01F_DI_O.png", percent_scale = 0.5, center = None, width = None, height = None):
+def read_image(
+    filename="faces/01F_DI_O.png",
+    percent_scale=0.5,
+    center=None,
+    width=None,
+    height=None,
+):
     rgba = imread(filename).astype("uint8")
     if center and width and height:
         c = (int(center[0] * rgba.shape[0] / 100), int(center[1] * rgba.shape[1] / 100))
@@ -77,7 +83,13 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
         dim = (int(height * 1.6), height)
     width, height = dim
     p = figure(plot_width=width, plot_height=height, x_range=x_lim, y_range=y_lim)
-    emotions = {"happy": (-1, -1), "calm": (-1, 1), "sad": (0.25, 1.0), "rage": (1, -1), "anger": (1,0.5)}
+    emotions = {
+        "happy": (-1, -1),
+        "calm": (-1, 1),
+        "sad": (0.25, 1.0),
+        "rage": (1, -1),
+        "anger": (1, 0.5),
+    }
     for emotion, (x, y) in emotions.items():
         w = Label(
             x=x,

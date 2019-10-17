@@ -6,11 +6,15 @@ import os
 from joblib import load
 from scipy.spatial import distance
 
+
 class FaceNotFoundException(Exception):
     """ Error when API can not find a face """
+
     pass
 
+
 model = load("face_model_rad.joblib")
+
 
 def get_facial_landmarks(img_data):
     """
@@ -25,8 +29,9 @@ def get_facial_landmarks(img_data):
 
     return face_recognition.face_landmarks(img_data)[0]
 
+
 def sort_api_data(x):
-    #def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
+    # def sort_api_data(x: dict[list[tuple]]) -> list[list[tuple]]:
     """ sorts API data based on keys provided by the face finder api """
     keys = [
         "chin",
@@ -37,10 +42,11 @@ def sort_api_data(x):
         "left_eye",
         "right_eye",
         "top_lip",
-        "bottom_lip"
+        "bottom_lip",
     ]
     y = [x[k] for k in keys]
     return y, keys
+
 
 def normalize(face_, feature_names):
     # def normalize(face_: list[list[tuple]], feature_names: list[str]) -> list[tuple]:
@@ -56,8 +62,8 @@ def normalize(face_, feature_names):
     # setting the nose to be the origin
     face_points = [(p[0] - nose[0], p[1] - nose[1]) for group in face for p in group]
 
-    right_eye = face[feature_names.index('right_eye')]
-    left_eye = face[feature_names.index('left_eye')]
+    right_eye = face[feature_names.index("right_eye")]
+    left_eye = face[feature_names.index("left_eye")]
 
     one_unit = LA.norm(np.array(right_eye) - np.array(left_eye))
 
@@ -68,14 +74,16 @@ def normalize(face_, feature_names):
 
     return face_points
 
+
 def distances(data, url=True):
     """ gets distances of a face from a given url """
     img_data = data if url == False else face_recognition.load_image_file(data)
-    face = get_facial_landmarks(img_data)    # get landmarks
-    face, names = sort_api_data(face)   # sort given deata
-    face = normalize(face, names)       # normalize all facial data
-    distances = distance.pdist(face)    # distances between each point
+    face = get_facial_landmarks(img_data)  # get landmarks
+    face, names = sort_api_data(face)  # sort given deata
+    face = normalize(face, names)  # normalize all facial data
+    distances = distance.pdist(face)  # distances between each point
     return distances
+
 
 def predict(img_data, url=True):
     """ predicts location for a face given a url """
