@@ -19,11 +19,11 @@ def make_image_label():
 
 def make_take_picture_label():
     # makes the label that displays click to continue
-    return Button(label="[OpenCV] Take Picture via Webcam", button_type="success")
+    return Button(label="Take Picture via Webcam", button_type="success")
 
 def make_steam_picture_label():
     # makes the label that displays click to continue
-    return Button(label="[OpenCV] Start Image Stream", button_type="primary")
+    return Button(label="Start Image Stream", button_type="primary")
 
 def make_prime_webcam_label():
     # makes the label that displays click to continue
@@ -40,7 +40,7 @@ def make_title_div():
     return Div(text="""<b style="color:black;font-size:500%;">NEXT Face Demo</b>""", width=1000, height=60)
 
 def make_description_div():
-    return Div(text="""<font style="color:gray;font-size:150%;">Begin by starting the webcam. Once the webcam is started, take a picture and your emotion will be predicted and plotted on the map!</font>""", width=1500, height=10)
+    return Div(text="""<font style="color:gray;font-size:150%; margin-bottom: 10px;"> </font>""", width=1500, height=10)
 
 def make_github_botton():
     return Button(label="View on GitHub", button_type="default")

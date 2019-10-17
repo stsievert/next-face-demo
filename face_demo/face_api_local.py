@@ -10,7 +10,7 @@ class FaceNotFoundException(Exception):
     """ Error when API can not find a face """
     pass
 
-model = load("face_model.joblib")
+model = load("face_model_rad.joblib")
 
 def get_facial_landmarks(img_data):
     """
@@ -68,20 +68,21 @@ def normalize(face_, feature_names):
 
     return face_points
 
-def distances(img_data):
+def distances(data, url=True):
     """ gets distances of a face from a given url """
+    img_data = data if url == False else face_recognition.load_image_file(data)
     face = get_facial_landmarks(img_data)    # get landmarks
     face, names = sort_api_data(face)   # sort given deata
     face = normalize(face, names)       # normalize all facial data
     distances = distance.pdist(face)    # distances between each point
     return distances
 
-def predict(img_data):
+def predict(img_data, url=True):
     """ predicts location for a face given a url """
 
     global model
 
-    x = distances(img_data)
+    x = distances(img_data, url)
 
     if len(x) == 0:
         raise Exception("Face Not Found")

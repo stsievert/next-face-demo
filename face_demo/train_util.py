@@ -1,4 +1,9 @@
-import loader
+try:
+    get_ipython()
+    import face_demo.loader
+except:
+    import loader    
+
 import numpy as np
 from joblib import dump
 from sklearn.model_selection import LeaveOneOut
@@ -72,10 +77,10 @@ def train_model(results, data, model):
 
     return model, distances, angles, changes
 
-def dump_model_to_disk(model):
+def dump_model_to_disk(model, name='face_model.joblib'):
     """
     saves model to disk
 
     note: not used in main application, only used to help choose model
     """
-    dump(model, "face_model.joblib")
+    dump(model, name)
