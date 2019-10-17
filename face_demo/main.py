@@ -52,7 +52,7 @@ title_div = plot_util.make_title_div()
 description_div = plot_util.make_description_div()
 
 # create the plot in which we will act on
-plot = generate_initial_plot(test=True, n_imgs=50, img_width=0.3, dim=figure_size)
+plot = generate_initial_plot(test=True, n_imgs=50, img_width=0.3, dim=figure_size, random_state=42)
 plot.toolbar.active_drag = None
 plot.toolbar.active_scroll = None
 plot.toolbar.active_tap = None

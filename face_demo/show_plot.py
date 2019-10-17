@@ -15,6 +15,7 @@ from scipy.misc import imresize
 import face_api_local as face_api
 import get_words
 import train_util
+from sklearn.utils import check_random_state
 
 
 def read_image(
@@ -55,10 +56,11 @@ def read_image(
     return img
 
 
-def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
+def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None, random_state=None):
+    random_state = check_random_state(random_state)
     #  output_file("embedding.html")
     e = pd.read_csv("train-files/embedding.csv", index_col=0)
-    e = e.reindex(np.random.permutation(e.index))
+    e = e.reindex(random_state.permutation(e.index))
     x_lim = (-1.1, 1.3)
     y_lim = (-1.2, 1.3)
 
@@ -84,11 +86,10 @@ def generate_initial_plot(test=False, n_imgs=-1, img_width=0.5, dim=None):
     width, height = dim
     p = figure(plot_width=width, plot_height=height, x_range=x_lim, y_range=y_lim)
     emotions = {
-        "happy": (-1, -1),
+        "happy": (-0.5, -0.5),
         "calm": (-1, 1),
         "sad": (0.25, 1.0),
-        "rage": (1, -1),
-        "anger": (1, 0.5),
+        "anger": (1, 0),
     }
     for emotion, (x, y) in emotions.items():
         w = Label(
