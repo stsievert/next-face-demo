@@ -34,7 +34,8 @@ capture_width = 200
 figure_size = (1200, 800)
 continue_loop = False
 # NOT a config variable
-loop_duration = 0.1
+loop_duration = 0.15
+N_AVG = int(1 / loop_duration)  # average for about 1 second
 prev_image = ""  # previously processed image
 doc = curdoc()
 camera = cv2.VideoCapture(0)
@@ -97,19 +98,21 @@ def callback(img_data, stream=True):
     try:
         y = predict(img_rgb, False)
         print("[MYAPP] Prediction successful")
+        e.visible = text_renderer.visible = True
     except FaceNotFoundException as exc:
         print("[MYAPP] Face not found, making random guess")
         y = [0, 0]
         face_found = False
+        e.visible = text_renderer.visible = False
 
     xv = y[0]
     yv = y[1]
     if face_found and stream == True:
         x_hist.append(xv)
         y_hist.append(yv)
-        if len(x_hist) > 10:
+        if len(x_hist) > N_AVG:
             x_hist.pop(0)
-        if len(y_hist) > 10:
+        if len(y_hist) > N_AVG:
             y_hist.pop(0)
     if avg_pts and face_found == True and stream == True:
         xv = sum(x_hist) / float(len(x_hist))
