@@ -6,3 +6,6 @@ scipy==1.2.1
 opencv-python
 pillow
 face_recognition
+pandas
+imageio
+scikit-learn
