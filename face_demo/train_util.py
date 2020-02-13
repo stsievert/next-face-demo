@@ -2,7 +2,7 @@ try:
     get_ipython()
     import face_demo.loader
 except:
-    import loader    
+    import loader
 
 import numpy as np
 from joblib import dump
@@ -14,6 +14,7 @@ def angle_between(p1, p2):
     ang2 = np.arctan2(*p2[::-1])
     return np.rad2deg((ang1 - ang2) % (2 * np.pi))
 
+
 def _trainModelForTrainTestSplit(train, test, data, results, model):
     """
     trains the model for one set of a train test split
@@ -22,7 +23,7 @@ def _trainModelForTrainTestSplit(train, test, data, results, model):
     """
 
     trainData = []
-    trainDataResults  = []
+    trainDataResults = []
     testData = []
     testDataResults = []
 
@@ -45,6 +46,7 @@ def _trainModelForTrainTestSplit(train, test, data, results, model):
     model.fit(trainData, trainDataResults)
     return testData, testDataResults
 
+
 def train_model(results, data, model):
     """
     Given expected results, dace data and a model this trains the model to the data
@@ -63,7 +65,9 @@ def train_model(results, data, model):
 
     for train_index, test_index in loo.split(D):
         # train model after each change
-        testData, testDataResults = _trainModelForTrainTestSplit(train_index, test_index, D, y, model)
+        testData, testDataResults = _trainModelForTrainTestSplit(
+            train_index, test_index, D, y, model
+        )
         # get variance for one test item
         d = testData[0]
         y1 = model.predict(d.reshape(1, -1))
@@ -77,7 +81,8 @@ def train_model(results, data, model):
 
     return model, distances, angles, changes
 
-def dump_model_to_disk(model, name='face_model.joblib'):
+
+def dump_model_to_disk(model, name="face_model.joblib"):
     """
     saves model to disk
 
